@@ -3,7 +3,7 @@
 # Script to run the Hop Universal Import Tool (hop-uit)
 # The tool converts Pentaho PDI .ktr files into .hpl files for the project-hop platform.
 #
-# uwe.geercken@web.de - last update: 2020-05-16
+# uwe.geercken@web.de - last update: 2020-05-18
 
 lib_hop_uit=hop-uit-0.0.1-SNAPSHOT.jar
 
