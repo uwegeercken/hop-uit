@@ -5,14 +5,17 @@ Program to convert files created by the Pentaho Data Integration tool (PDI) into
 Files are read from the input folder, converted and output to the output folder. Database metadata files are created in a subfolder of the Hop config directory folder. If a file name is specified, this and only this file	is processed from the input folder. If no file name is specified then all files in the input folder are processed.	Files are not overwritten in case they already exist
 
 ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[Hop config directory]
-where [inputfolder]          : required. path to the folder where the ktr files are located
-      [outputfolder]         : required. path to the folder where the hpl files are output to
-      [file name]            : optional. name of a single ktr file to convert
-      [Hop config directory] : required. name of the folder where the Hop configuration files are located
+where
 
-example: ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/config
+* [inputfolder]          : required. path to the folder where the ktr files are located
+* [outputfolder]         : required. path to the folder where the hpl files are output to
+* [file name]            : optional. name of a single ktr file to convert
+* [Hop config directory] : required. name of the folder where the Hop configuration files are located
 
-example: ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config
+example:
+
+* ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/config
+* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config
 
 Please send your feedback and help to enhance the tool.
 
