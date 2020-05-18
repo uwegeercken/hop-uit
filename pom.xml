@@ -1,0 +1,100 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache</groupId>
+  <artifactId>hop-uit</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <lib.velocity.version>2.2</lib.velocity.version>
+        <lib.slf4j.version>1.7.26</lib.slf4j.version>
+        <lib.log4j.version>1.2.17</lib.log4j.version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-log4j12</artifactId>
+		<version>${lib.slf4j.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<version>${lib.log4j.version}</version>
+	</dependency>
+	<dependency>
+		  <groupId>org.apache.velocity</groupId>
+		  <artifactId>velocity-engine-core</artifactId>
+		  <version>${lib.velocity.version}</version>
+	</dependency>
+
+  </dependencies>
+  
+  <distributionManagement>
+    <repository>
+      <id>nexus</id>
+      <name>Releases</name>
+      <url>http://localhost:8081/repository/maven-releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus</id>
+      <name>Snapshot</name>
+      <url>http://localhost:8081/repository/maven-snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
+  <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
+	        <plugin>
+            	<artifactId>maven-dependency-plugin</artifactId>
+	            <executions>
+	              <execution>
+	                <phase>install</phase>
+	                <goals>
+	                  <goal>copy-dependencies</goal>
+	                </goals>
+	                <configuration>
+	                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+	                </configuration>
+	              </execution>
+            	</executions>
+          	</plugin>
+          	<plugin>
+			    <artifactId>maven-resources-plugin</artifactId>
+			    <version>3.0.1</version>
+			    <executions>
+			         <execution>
+			            <id>copy-resources</id>
+			            <!-- here the phase you need -->
+			            <phase>install</phase>
+			            <goals>
+			               <goal>copy-resources</goal>
+			            </goals>
+			            <configuration>
+			               <outputDirectory>${basedir}/target</outputDirectory>
+			               <resources>          
+			                    <resource>
+			                        <directory>src/main/additional</directory>
+			                        <filtering>true</filtering>
+			                    </resource>
+			               </resources>              
+			            </configuration>            
+			        </execution>
+			     </executions>
+			</plugin>
+		</plugins>
+    </build>
+</project>
