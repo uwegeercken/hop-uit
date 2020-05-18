@@ -11,13 +11,12 @@ where [inputfolder]          : required. path to the folder where the ktr files 
       [Hop config directory] : required. name of the folder where the Hop configuration files are located
 
 example: ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/config
-       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config
 
+example: ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config
 
 Please send your feedback and help to enhance the tool.
 
-   Copyright (C) 2020  Uwe Geercken
-
+Copyright (C) 2020  Uwe Geercken
 
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -35,7 +34,6 @@ software distributed under the License is distributed on an
 KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
-
 
 uwe geercken
 uwe.geercken@web.de
