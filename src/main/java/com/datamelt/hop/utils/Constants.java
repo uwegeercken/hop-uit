@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.utils;
+package com.datamelt.hop.utils;
 
 import java.util.HashMap;
 
-import org.apache.tools.Connection;
+import com.datamelt.hop.uit.Connection;
 
 public class Constants 
 {

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Script to run the Hop Universal Import Tool (hop-uit)
+# Script to run the Hop Ultimate Import Tool (hop-uit)
 # The tool converts Pentaho PDI .ktr files into .hpl files for the project-hop platform.
 #
 # uwe.geercken@web.de - last update: 2020-05-18

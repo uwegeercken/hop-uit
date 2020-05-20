@@ -16,9 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.tools;
+package com.datamelt.hop.uit;
 import org.apache.log4j.Logger;
-import org.apache.utils.Constants;
+import com.datamelt.hop.utils.Constants;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.tools;
+package com.datamelt.hop.uit;
 
 public class Connection 
 {

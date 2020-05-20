@@ -4,6 +4,14 @@ Program to convert files created by the Pentaho Data Integration tool (PDI) into
 
 Files are read from the input folder, converted and output to the output folder. Database metadata files are created in a subfolder of the Hop config directory folder. If a file name is specified, this and only this file	is processed from the input folder. If no file name is specified then all files in the input folder are processed.	Files are not overwritten in case they already exist
 
+Build:
+
+Run a "mvn clean install" to build the package. In the folder named "target" there will be
+
+* a folder "lib" with all dependent libraries
+* the hop-uit library file: hop-uit-<version>.jar
+* a shell script to run the tool.
+
 Usage:
 
 ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[Hop config directory]
@@ -43,4 +51,4 @@ under the License.
 uwe geercken
 uwe.geercken@web.de
 
-last update: 2020-05-18
+last update: 2020-05-19

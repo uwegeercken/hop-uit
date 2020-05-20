@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.tools;
+package com.datamelt.hop.uit;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.apache.utils.Constants;
+import com.datamelt.hop.utils.Constants;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -31,7 +31,9 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 /**
- * tool to convert Pentaho Data Integration (PDI) .ktr files to the Project-Hop .hpl file format. Pentaho PDI files are XML files.
+ * Hop Ultimate Import Tool - Hop - UIT
+ * 
+ * Tool to convert Pentaho Data Integration (PDI) .ktr files to the Project-Hop .hpl file format. Pentaho PDI files are XML files.
  * 
  * Project Hop provides a gui for designing ETL flows, several client programs and a server component. As Hop is a fork of the PDI
  * tool at some point in time, the file format is largely the same. But for various reasons some parts are different.
@@ -58,7 +60,7 @@ public class ImportTool
 {
 	
 	private static final String version 		= "0.1.0";
-	private static final String versionDate 	= "2020-05-16";
+	private static final String versionDate 	= "2020-05-18";
 	
 	private static String inputfolder;
 	private static String outputfolder;
