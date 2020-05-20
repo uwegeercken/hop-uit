@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache</groupId>
+  <groupId>com.datamelt.hop</groupId>
   <artifactId>hop-uit</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
@@ -38,12 +38,12 @@
     <repository>
       <id>nexus</id>
       <name>Releases</name>
-      <url>http://localhost:8081/repository/maven-releases</url>
+      <url>http://silent1:8081/repository/maven-releases</url>
     </repository>
     <snapshotRepository>
       <id>nexus</id>
       <name>Snapshot</name>
-      <url>http://localhost:8081/repository/maven-snapshots</url>
+      <url>http://silent1:8081/repository/maven-snapshots</url>
     </snapshotRepository>
   </distributionManagement>
   
