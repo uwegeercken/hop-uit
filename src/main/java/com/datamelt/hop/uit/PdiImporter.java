@@ -78,11 +78,9 @@ public class PdiImporter
         	}
         	else
         	{
-    			errors++;
-        		logger.error("file already exists - no output created: " + newFile.getName());
+        		logger.warn("file already exists. no file generated: " + newFile.getName());
         	}
         }
-
         return errors;
 	}
 	
@@ -127,7 +125,7 @@ public class PdiImporter
 		}
 		else
 		{
-			logger.warn("no database metadata file created - file already exists: " + file.getName());
+			logger.warn("database metadata file already exists. no file generated: " + file.getName());
 		}
 	}
 	
