@@ -2,7 +2,7 @@ Hop Ultimate Import Tool
 
 Program to convert files created by the Pentaho Data Integration tool (PDI) into the HOP format.
 
-Files are read from the input folder, converted and output to the output folder. Database metadata files are created in a subfolder of the Hop config directory folder. If a file name is specified, this and only this file	is processed from the input folder. If no file name is specified then all files in the input folder are processed.	Files are not overwritten in case they already exist
+Files are read from the input folder, converted and output to the output folder. Database metadata files are created in a subfolder of the Hop config directory folder. If a file name is specified, this file	is processed from the input folder. The -f argument may be used multiple times. If no file name is specified then all files in the input folder are processed. Files are not overwritten in case they already exist.
 
 Build:
 
@@ -11,6 +11,8 @@ Run a "mvn clean install" to build the package. In the folder named "target" the
 * a folder "lib" with all dependent libraries
 * the hop-uit library file: hop-uit-<version>.jar
 * a shell script to run the tool.
+
+NOTE: You will need to change the file permissions on the hop-uit.sh script so that the file is executable.
 
 Usage:
 
@@ -26,6 +28,7 @@ Examples:
 
 * ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/config
 * ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config
+* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr -c=/home/me/config
 
 Please send your feedback and help to enhance the tool.
 
@@ -51,4 +54,4 @@ under the License.
 uwe geercken
 uwe.geercken@web.de
 
-last update: 2020-05-19
+last update: 2020-05-20
