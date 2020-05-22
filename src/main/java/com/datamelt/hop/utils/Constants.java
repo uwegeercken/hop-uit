@@ -35,12 +35,22 @@ public class Constants
 	public static final String TAG_CONNECTION_CHILD_USERNAME					= "username";
 	public static final String TAG_CONNECTION_CHILD_PASSWORD					= "password";
 	
+	public static final String TAG_JOB_TAG_ACTION								= "action";
+	public static final String TAG_JOB_TAG_ACTION_TYPE							= "type";
+	
 	public static final String DATABASE_METADATA_TEMPLATE_OBJECT_KEY 			= "connection";
 	public static final String HOP_DATABASE_CONNECTIONS_FOLDER 					= "metastore/Relational Database Connection";
+	
+	public static final String ENVIRONMENT_METADATA_TEMPLATE_OBJECT_KEY 		= "environment";
+	public static final String HOP_ENVIRONMENTS_FOLDER		 					= "environments/metastore/Hop Environment";
 
 	public static final String PDI_TRANSFORMATION_FILENAME_EXTENSION 			= ".ktr";
 	public static final String HOP_PIPELINE_FILENAME_EXTENSION 					= ".hpl";
+	public static final String PDI_JOB_FILENAME_EXTENSION 						= ".kjb";
+	public static final String HOP_WORKFLOW_FILENAME_EXTENSION 					= ".hwf";
+
 	
+	// loading from classpath
 	public static final String DATABASE_METADATA_VELOCITY_TEMPLATE				= "/templates/database.xml.template";
 	
 	public static final String DATABASE_METADATA_PLUGIN_ID						= "pluginid";
@@ -90,12 +100,17 @@ public class Constants
 	public static final String DATABASE_TYPE_VERTICA							= "VERTICA";
 	public static final String DATABASE_TYPE_VERTICA5							= "VERTICA5";
 	
+	public static final String FOLDER_ENVIRONMENT								= "hop-uit-environment";
+	public static final String FOLDER_FILES										= "files";
+	
+	public static final int FILE_TYPE_KJB										= 0;
+	public static final int FILE_TYPE_KTR										= 1;
 	/**
-	 * returns a map of replacements between the Kettle/PDI format and the Hop format 
+	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline 
 	 * 
 	 * @return
 	 */
-	public static HashMap<String, String> getXmlReplacementMap()
+	public static HashMap<String, String> getXmlKtrReplacementMap()
 	{
 		HashMap<String, String> replacements = new HashMap<>();
 	    replacements.put("transformation", "pipeline");
@@ -103,6 +118,36 @@ public class Constants
 	    replacements.put("trans_status", "pipeline_status");
 	    replacements.put("step", "transform");
 	    replacements.put("step_error_handling", "transform_error_handling");
+	    
+	    return replacements;
+	}
+	
+	/**
+	 * returns a map of replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
+	 * 
+	 * @return
+	 */
+	public static HashMap<String, String> getXmlKjbReplacementMap()
+	{
+		HashMap<String, String> replacements = new HashMap<>();
+	    replacements.put("job", "workflow");
+	    replacements.put("job_version", "workflow_version");
+	    replacements.put("entries", "actions");
+	    replacements.put("entry", "action");
+	    replacements.put("job-log-table", "workflow-log-table");
+	    
+	    return replacements;
+	}
+	
+	/**
+	 * returns a map of replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
+	 * 
+	 * @return
+	 */
+	public static HashMap<String, String> getXmlKjbTextReplacementMap()
+	{
+		HashMap<String, String> replacements = new HashMap<>();
+	    replacements.put("TRANS", "PIPELINE");
 	    
 	    return replacements;
 	}

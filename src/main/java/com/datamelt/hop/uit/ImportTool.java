@@ -62,13 +62,15 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 public class ImportTool 
 {
 	
-	private static final String version 		= "0.1.1";
-	private static final String versionDate 	= "2020-05-20";
+	private static final String version 		= "0.1.2";
+	private static final String versionDate 	= "2020-05-21";
 	
 	private static String inputfolder;
 	private static String outputfolder;
+	private static String outputfolderEnvironment;
+	private static String outputfolderFiles;
+	
 	private static ArrayList<String> inputFilenames = new ArrayList<>();
-	private static String hopConfigDirectory;
 	
 	private final static Logger logger = Logger.getLogger(ImportTool.class);
 	
@@ -77,7 +79,7 @@ public class ImportTool
 		int numberOfFilesWithErrors = 0;
 		int numberOfErrorsTotal=0;
 		
-		if(args.length<3 || args[0].equals("--help") || args[0].equals("-h"))
+		if(args.length<2 || args[0].equals("--help") || args[0].equals("-h"))
 		{
 			help();
 		}
@@ -88,6 +90,12 @@ public class ImportTool
 			PdiImporter importer = new PdiImporter();
 			processArguments(importer, args);
 
+			outputfolderEnvironment = outputfolder + "/" + Constants.FOLDER_ENVIRONMENT;
+			outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
+			
+			importer.setOutputfolderEnvironment(outputfolderEnvironment);
+			importer.setOutputfolderFiles(outputfolderFiles);
+			
 			// get an apache Velocity context we can use
 			importer.setVelocityContext(getVelocityContext());
 			
@@ -95,22 +103,15 @@ public class ImportTool
 			Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
 			importer.setVelocityTemplate(databaseTemplate);
 
-			// replacements to be made in the original file
-			importer.setReplacements(Constants.getXmlReplacementMap());
-			// map of database types and their references
-			importer.setDatabaseConnectionTypes(Constants.getDatabaseConnectionMap());
-			
-			importer.setHopConfigDirectory(hopConfigDirectory);
-			
 			// we need an inputfolder where all files to process are located
-			if(inputfolder != null && outputfolder!=null && hopConfigDirectory!=null)
+			if(inputfolder != null && outputfolder!=null)
 			{
 				logger.info("processing files from: " + inputfolder);
 				logger.info("output files to: " + outputfolder);
-				logger.info("config directory: " + hopConfigDirectory);
 				
 				// create the output folder if not present
-				createFolder(outputfolder);
+				createFolder(outputfolderEnvironment);
+				createFolder(outputfolderFiles);
 				
 				File[] files = null;
 				
@@ -145,7 +146,6 @@ public class ImportTool
 				// loop over files and process them
 				for(int i=0;i<files.length;i++)
 				{
-					importer.setNewFilename(getNewFilename(outputfolder, files[i].getName()));
 					int errors = importer.processFile(files[i]);
 					numberOfErrorsTotal = numberOfErrorsTotal + errors;
 					if(errors>0)
@@ -161,7 +161,7 @@ public class ImportTool
 			}
 			else
 			{
-				logger.error("inputfolder, outputfolder and Hop config directory must be specified");
+				logger.error("inputfolder and outputfolder must be specified");
 			}
 		}
 		
@@ -193,10 +193,6 @@ public class ImportTool
 			{
 				inputFilenames.add(args[i].substring(3));
 			}
-			else if(args[i].startsWith("-c="))
-			{
-				hopConfigDirectory = args[i].substring(3);
-			}
 		}
 	}
 	
@@ -209,11 +205,6 @@ public class ImportTool
 	{
 		File f = new File(folder);
 		f.mkdirs();
-	}
-	
-	private static String getNewFilename(String outputFolder, String filename)
-	{
-		return outputFolder + "/" + filename.replace(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION, Constants.HOP_PIPELINE_FILENAME_EXTENSION);
 	}
 	
 	private static String getVersionInfo()
@@ -246,10 +237,9 @@ public class ImportTool
 	{
 		System.out.println("ImportTool " + getVersionInfo()); 
 		System.out.println("Program to convert files created by the Pentaho Data Integration tool (PDI) into the HOP format.");
-		System.out.println("Files are read from the input folder, converted and output to the output folder. Database metadata files are");
-		System.out.println("created in a subfolder of the Hop config directory folder. If a file name is specified, this file is processed");
-    	System.out.println("from the input folder. Multiple file names may be specified by repeating the -f argument. If no file name is");
-    	System.out.println("specified then all files in the input folder are processed.");
+		System.out.println("Files are read from the input folder, converted and output to the output folder. If a file name is");
+		System.out.println("specified, this file is processed from the input folder. Multiple file names may be specified by");
+		System.out.println("repeating the -f argument. If no file name is specified then all files in the input folder are processed.");
     	System.out.println();
     	System.out.println("Files are not overwritten in case they already exist");
     	System.out.println();
@@ -257,11 +247,10 @@ public class ImportTool
     	System.out.println("where [inputfolder]          : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]         : required. path to the folder where the hpl files are output to");
     	System.out.println("      [file name]            : optional. name of a .ktr file to convert - can be specified multiple times");
-    	System.out.println("      [Hop config directory] : required. name of the folder where the Hop configuration files are located");
     	System.out.println();
-    	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/config");
-    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config");
-    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr -c=/home/me/config");
+    	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr");
     	System.out.println();
     	System.out.println("published as open source under the Apache License. read the licence notice.");
     	System.out.println("check https://github.com/uwegeercken for more");

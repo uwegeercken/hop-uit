@@ -46,41 +46,89 @@ import org.w3c.dom.NodeList;
 public class PdiImporter
 {
 	private String newFilename;
-	private String hopConfigDirectory;
+	private int fileType;
 
-	private HashMap<String, String> replacements;
-	private HashMap<String, Connection> databaseConnectionTypes;
+	private HashMap<String, String> replacementsKtrFile = Constants.getXmlKtrReplacementMap();
+	private HashMap<String, String> replacementsKjbFile = Constants.getXmlKjbReplacementMap();
+	private HashMap<String, String> replacementsKjbFileText = Constants.getXmlKjbTextReplacementMap();
 	
+	private HashMap<String, Connection> databaseConnectionTypes = Constants.getDatabaseConnectionMap();
 	private VelocityContext context;
 	private Template databaseTemplate;
-	
 	private final static Logger logger = Logger.getLogger(PdiImporter.class);
 	
-	public int processFile(File file) throws Exception
+	private String outputfolderEnvironment;
+	private String outputfolderFiles;
+	
+	public int processFile(File file)
 	{
+		int errors = 0;
+		
 		// parse the file
-		Document document = parseDocument(file);
+		try
+		{
+			Document document = parseDocument(file);
+			
+			// check file type
+			determineFileType(document);
+			
+			if(fileType==Constants.FILE_TYPE_KJB)
+			{
+				// rename nodes according to map
+				renameNodes(document);
+		        
+				// process text values
+				processText(document);
+				
+		        // write document only if no errors happened when trying to
+		        // create the database connection files
+		        if(errors==0)
+		        {
+		        	File newFile = new File(getNewFilename(file.getName()));
+		        	if(!newFile.exists())
+		        	{
+		        		writeDocument(newFile,document);
+		        	}
+		        	else
+		        	{
+		        		logger.warn("file already exists. no file generated: " + newFile.getName());
+		        	}
+		        }
+			}
+			else if(fileType==Constants.FILE_TYPE_KTR)
+			{
+				// rename nodes according to map
+				renameNodes(document);
+		        
+		        // modify the connection node and write database metadata file(s)
+		        processConnectionNode(document);
+				
+		        // write document only if no errors happened when trying to
+		        // create the database connection files
+		        if(errors==0)
+		        {
+		        	File newFile = new File(getNewFilename(file.getName()));
+		        	if(!newFile.exists())
+		        	{
+		        		writeDocument(newFile,document);
+		        	}
+		        	else
+		        	{
+		        		logger.warn("file already exists. no file generated: " + newFile.getName());
+		        	}
+		        }
+			}
+			else
+			{
+				logger.warn("file is not a .kjb or .ktr file: " + file.getName());
+			}
+		}
+		catch(Exception ex)
+		{
+			logger.error("the file could not be parsed: " + file.getName() + ", error: " + ex.getMessage());
+			errors++;
+		}
 		
-		// rename nodes according to map
-		renameNodes(document);
-        
-        // modify the connection node and write database metadata file(s)
-        int errors = processConnectionNode(document);
-		
-        // write document only if no errors happened when trying to
-        // create the database connection files
-        if(errors==0)
-        {
-        	File newFile = new File(newFilename);
-        	if(!newFile.exists())
-        	{
-        		writeDocument(newFile,document);
-        	}
-        	else
-        	{
-        		logger.warn("file already exists. no file generated: " + newFile.getName());
-        	}
-        }
         return errors;
 	}
 	
@@ -92,6 +140,22 @@ public class PdiImporter
         return builder.parse(file);
 	}
 	
+	private void determineFileType(Document document)
+	{
+		// check if file has a job tag
+		NodeList nodesJob = document.getElementsByTagName("job");
+		NodeList nodesTransformation = document.getElementsByTagName("transformation");
+		
+		if(nodesJob.getLength()>0)
+		{
+			fileType = Constants.FILE_TYPE_KJB;
+		}
+		else if(nodesTransformation.getLength()>0)
+		{
+			fileType = Constants.FILE_TYPE_KTR;
+		}
+	}
+	
 	private void writeDocument(File newFile,Document document) throws Exception
 	{
 		logger.debug("writing file: " + newFilename);
@@ -100,6 +164,18 @@ public class PdiImporter
 		Source input = new DOMSource(document);
 		Result output = new StreamResult(newFile);
 		transformer.transform(input, output);
+	}
+	
+	private String getNewFilename(String filename)
+	{
+		if(fileType== Constants.FILE_TYPE_KJB)
+		{
+			return outputfolderFiles + "/" + filename.replace(Constants.PDI_JOB_FILENAME_EXTENSION, Constants.HOP_WORKFLOW_FILENAME_EXTENSION);
+		}
+		else
+		{
+			return outputfolderFiles + "/" + filename.replace(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION, Constants.HOP_PIPELINE_FILENAME_EXTENSION);
+		}
 	}
 	
 	private void writeDatabaseMetadataFile(HashMap<String, String> connectionAttributes) throws Exception
@@ -129,22 +205,33 @@ public class PdiImporter
 		}
 	}
 	
-	public File createDatabaseMetadataFile(String connectionName)
+	private File createDatabaseMetadataFile(String connectionName)
 	{
-		File folder = new File(hopConfigDirectory + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER);
+		File folder = new File(outputfolderEnvironment + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER);
 		folder.mkdirs();
 		
-		String fullFilename = hopConfigDirectory + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER + "/" + connectionName + ".xml";
+		String fullFilename = outputfolderEnvironment + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER + "/" + connectionName + ".xml";
 		File file = new File(fullFilename);
 		return file;
 	}
 	
 	private void renameNodes(Document document)
 	{
-		for(String key:replacements.keySet())
-        {
-        	renameNode(document,key,replacements.get(key));
-        }
+		if(fileType== Constants.FILE_TYPE_KJB)
+		{
+			for(String key:replacementsKjbFile.keySet())
+	        {
+	        	renameNode(document,key,replacementsKjbFile.get(key));
+	        }
+		}
+		else if(fileType== Constants.FILE_TYPE_KTR)
+		{
+			for(String key:replacementsKtrFile.keySet())
+	        {
+	        	renameNode(document,key,replacementsKtrFile.get(key));
+	        }
+		}
+		
 	}
 	
 	private void renameNode(Document document, String from, String to)
@@ -157,6 +244,33 @@ public class PdiImporter
             Node node = nodes.item(i);
             document.renameNode(node, null, to);
         }
+	}
+	
+	private int processText(Document document) throws Exception
+	{
+		int errors = 0;
+		NodeList nodes = document.getElementsByTagName(Constants.TAG_JOB_TAG_ACTION);
+		
+		for (int i = 0; i < nodes.getLength(); i++) 
+        {
+        	Node mainNode = nodes.item(i);
+        	if (mainNode.getNodeType() == Node.ELEMENT_NODE) 
+        	{
+	        	Element element = (Element) mainNode;
+	        	NodeList typeNode = element.getElementsByTagName(Constants.TAG_JOB_TAG_ACTION_TYPE);
+	        	if(typeNode.getLength()==1)
+	        	{
+	        		String currentValue = typeNode.item(0).getTextContent();
+	        		String replacement = replacementsKjbFileText.get(currentValue);
+        			if(replacement!=null)
+        			{
+        				typeNode.item(0).setTextContent(replacement);
+        			}
+	        	}
+        	}
+        }
+		
+		return errors;
 	}
 	
 	private int processConnectionNode(Document document) throws Exception
@@ -224,16 +338,6 @@ public class PdiImporter
         return errors;
 	}
 
-	public HashMap<String, String> getReplacements() 
-	{
-		return replacements;
-	}
-
-	public void setReplacements(HashMap<String, String> replacements) 
-	{
-		this.replacements = replacements;
-	}
-
 	public HashMap<String, Connection> getDatabaseConnectionTypes() 
 	{
 		return databaseConnectionTypes;
@@ -269,15 +373,23 @@ public class PdiImporter
 		this.newFilename = newFilename;
 	}
 
-	public String getHopConfigDirectory() 
+	public String getOutputfolderEnvironment() 
 	{
-		return hopConfigDirectory;
+		return outputfolderEnvironment;
 	}
 
-	public void setHopConfigDirectory(String hopConfigDirectory) 
+	public void setOutputfolderEnvironment(String outputfolderEnvironment) 
 	{
-		this.hopConfigDirectory = hopConfigDirectory;
+		this.outputfolderEnvironment = outputfolderEnvironment;
 	}
 
-	
+	public String getOutputfolderFiles() 
+	{
+		return outputfolderFiles;
+	}
+
+	public void setOutputfolderFiles(String outputfolderFiles) 
+	{
+		this.outputfolderFiles = outputfolderFiles;
+	}
 }
