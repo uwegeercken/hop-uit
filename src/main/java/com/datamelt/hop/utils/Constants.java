@@ -52,6 +52,7 @@ public class Constants
 	
 	// loading from classpath
 	public static final String DATABASE_METADATA_VELOCITY_TEMPLATE				= "/templates/database.xml.template";
+	public static final String ENVIRONMENT_VELOCITY_TEMPLATE					= "/templates/environment.xml.template";
 	
 	public static final String DATABASE_METADATA_PLUGIN_ID						= "pluginid";
 	public static final String DATABASE_METADATA_PLUGIN_NAME					= "pluginname";
@@ -105,6 +106,7 @@ public class Constants
 	
 	public static final int FILE_TYPE_KJB										= 0;
 	public static final int FILE_TYPE_KTR										= 1;
+	
 	/**
 	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline 
 	 * 
@@ -140,7 +142,7 @@ public class Constants
 	}
 	
 	/**
-	 * returns a map of replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
+	 * returns a map of node text replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
 	 * 
 	 * @return
 	 */

@@ -207,6 +207,16 @@ public class ImportTool
 		f.mkdirs();
 	}
 	
+	/**
+	 * create a folder and all parent folder, if they don't exist.
+	 * 
+	 * @param folder  name of the folder to create
+	 */
+	private static void createEnvironment()
+	{
+		
+	}
+	
 	private static String getVersionInfo()
 	{
 		return "Version " + version + ", last update: " + versionDate; 
@@ -243,7 +253,7 @@ public class ImportTool
     	System.out.println();
     	System.out.println("Files are not overwritten in case they already exist");
     	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[Hop config directory]");
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name]");
     	System.out.println("where [inputfolder]          : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]         : required. path to the folder where the hpl files are output to");
     	System.out.println("      [file name]            : optional. name of a .ktr file to convert - can be specified multiple times");
