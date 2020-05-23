@@ -1,8 +1,12 @@
 Hop Ultimate Import Tool
 
-Program to convert files created by the Pentaho Data Integration tool (PDI) into the HOP format.
+Program to convert .kjb and .ktr files created by the Pentaho Data Integration tool (PDI) into the equivalent HOP formats .hpl and .hwf.
 
-Files are read from the input folder, converted and output to the output folder. Database metadata files are created in a subfolder of the Hop config directory folder. If a file name is specified, this file	is processed from the input folder. The -f argument may be used multiple times. If no file name is specified then all files in the input folder are processed. Files are not overwritten in case they already exist.
+Files are read from the input folder, converted and output to the output folder. If one or multiple file names are specified, then only these files are processed from the input folder. The -f argument to specify a filename may be defined multiple times. If no file name is specified then all files in the input folder are processed. Files are not overwritten in case they already exist.
+
+A folder "hop-uit-environment" is created as a Hop environment base folder. Database metadata files are created in a subfolder of this folder. After running the hop-uit tool and after the conversion of input files is complete, one can define a new environment in the Hop GUI poiting the value of "Environment base folder" to the "hop-uit-environment" folder that was created runnint the hop-uit tool. This way all database connection files that were converted and created are readily available in Hop.
+
+Adjust the log level in log4j.properties to DEBUG to receive more detailed output.
 
 Build:
 
@@ -10,25 +14,25 @@ Run a "mvn clean install" to build the package. In the folder named "target" the
 
 * a folder "lib" with all dependent libraries
 * the hop-uit library file: hop-uit-<version>.jar
+* a log4j.properties file
 * a shell script to run the tool.
 
 NOTE: You will need to change the file permissions on the hop-uit.sh script so that the file is executable.
 
 Usage:
 
-ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[Hop config directory]
+ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name]
 where
 
 * [inputfolder]          : required. path to the folder where the ktr files are located
 * [outputfolder]         : required. path to the folder where the converted ktr files (hpl files) are output to
-* [file name]            : optional. name of a single ktr file to convert
-* [Hop config directory] : required. name of the folder where the Hop metadata files are stored
+* [file name]            : optional. name of a ktr file to convert. argument may be specified multiple times.
 
 Examples:
 
-* ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/config
-* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr -c=/home/me/config
-* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr -c=/home/me/config
+* ImportTool -i=/home/me/input -o=/home/me/output
+* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr
+* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr
 
 Please send your feedback and help to enhance the tool.
 
@@ -54,4 +58,4 @@ under the License.
 uwe geercken
 uwe.geercken@web.de
 
-last update: 2020-05-20
+last update: 2020-05-23
