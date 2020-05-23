@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <element>
-  <id>${HOP_ENVIRONMENT|'default'}</id>
+  <id>${HOP_ENVIRONMENT|'hop-uit-default'}</id>
   <value/>
   <type>String</type>
   <children>
@@ -34,11 +34,11 @@
         </child>
         #set($counter=${counter|0}+1)
       #end
-      <children>
+      </children>
     </child>
     <child>
       <id>metaStoreBaseFolder</id>
-      <value>${HOP_ENVIRONMENT_HOME_FOLDER}</value>
+      <value>${ENVIRONMENT_HOME}</value>
       <type>String</type>
     </child>
     <child>
@@ -63,12 +63,12 @@
     </child>
     <child>
       <id>unitTestsBasePath</id>
-      <value>${HOP_ENVIRONMENT_HOME_FOLDER}</value>
+      <value>${ENVIRONMENT_HOME}</value>
       <type>String</type>
     </child>
     <child>
       <id>version</id>
-      <value>!${HOP_ENVIRONMENT_VERSION}</value>
+      <value>$!{HOP_ENVIRONMENT_VERSION}</value>
       <type>String</type>
     </child>
     <child>
@@ -78,7 +78,7 @@
     </child>
     <child>
       <id>dataSetsCsvFolder</id>
-      <value>${HOP_ENVIRONMENT_HOME_FOLDER}/datasets</value>
+      <value>${ENVIRONMENT_HOME}/datasets</value>
       <type>String</type>
     </child>
     <child>
@@ -87,7 +87,7 @@
       <type>String</type>
     </child>
   </children>
-  <name>${HOP_ENVIRONMENT|'default'}</name>
+  <name>${HOP_ENVIRONMENT|'hop-uit-default'}</name>
   <security>
     <owner/>
     <owner-permissions-list/>

@@ -4,7 +4,9 @@ Program to convert .kjb and .ktr files created by the Pentaho Data Integration t
 
 Files are read from the input folder, converted and output to the output folder. If one or multiple file names are specified, then only these files are processed from the input folder. The -f argument to specify a filename may be defined multiple times. If no file name is specified then all files in the input folder are processed. Files are not overwritten in case they already exist.
 
-A folder "hop-uit-environment" is created as a Hop environment base folder. Database metadata files are created in a subfolder of this folder. After running the hop-uit tool and after the conversion of input files is complete, one can define a new environment in the Hop GUI poiting the value of "Environment base folder" to the "hop-uit-environment" folder that was created runnint the hop-uit tool. This way all database connection files that were converted and created are readily available in Hop.
+A folder "hop-uit-environment" is created as a Hop environment base folder. Database metadata files are created in a subfolder of this folder. After running the hop-uit tool and after the conversion of input files is complete, one can define a new environment in the Hop GUI poiting the value of "Environment base folder" to the "hop-uit-environment" folder that was created running the hop-uit tool. This way all database connection metadata files that were converted are readily available in Hop.
+
+NOTE: Instead of creating a new environment in the Hop GUI, you can also copy the file "default_environment.xml" from the output folder to /<Hop installation folder>/config/environments/metastore/Hop Environment.
 
 Adjust the log level in log4j.properties to DEBUG to receive more detailed output.
 

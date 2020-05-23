@@ -266,7 +266,8 @@ public class ImportTool
 		
 		Template environmentTemplate = Velocity.getTemplate(Constants.ENVIRONMENT_VELOCITY_TEMPLATE);
 		
-		context.put("HOP_ENVIRONMENT","environment");
+		context.put("HOP_ENVIRONMENT","hop-uit-default");
+		context.put("HOP_ENVIRONMENT_DESCRIPTION","hop-uit-default environment");
 		context.put("HOP_ENVIRONMENT_HOME_FOLDER",outputfolderEnvironment);
 		
 		logger.debug("merging template and environment attributes");
