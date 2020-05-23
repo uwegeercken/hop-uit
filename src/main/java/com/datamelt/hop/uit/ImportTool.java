@@ -28,12 +28,11 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -46,12 +45,13 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  * Tool to convert Pentaho Data Integration (PDI) .ktr files to the Project-Hop .hpl file format. Pentaho PDI files are XML files.
  * 
  * Project Hop provides a gui for designing ETL flows, several client programs and a server component. As Hop is a fork of the PDI
- * tool at some point in time, the file format is largely the same. But for various reasons some parts are different.
+ * tool at a specific point in time, the file format is largely the same. But for various reasons some parts of the Hop file format
+ * are different.
  * 
  * What is converted:
  * 
  * Tags:
- * Some tags are different between the .ktr and the .hpl XML file format (structure of the XML file is not changed)
+ * Some tags are different between the .ktr or .kjb and the .hpl or .hwf XML file format.
  * 
  * Database Connections:
  * Database connections are embedded in the PDI XML file. Hop externalizes this information into metadata files and stores them in a folder
@@ -59,9 +59,11 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  * 
  * Note:
  * Database connections are identified by their name in the PDI XML file. Consequently a Hop metadata file is written with this name, if it
- * does not already exist. If it exists, no Hop metadata file is written.
+ * does not exist. If it exists, the existing file is not overwritten.
  * 
- * If the converted file in the output folder already exists, then the existing file is not overwritten.
+ * If the converted .ktr or .kjb file in the output folder already exists, then the existing file is not overwritten.
+ * 
+ * The tool creates a Hop environment base folder containing relevant information from the conversion, such as database metadata connection files.
  * 
  * @author uwe geercken
  *
@@ -82,7 +84,8 @@ public class ImportTool
 	private static Map<String, String> environmentVariables;
 	private static VelocityContext context;
 	private static ArrayList<String> inputFilenames = new ArrayList<>();
-	private final static Logger logger = Logger.getLogger(ImportTool.class);
+	
+	private static final Logger logger = LogManager.getLogger(ImportTool.class);
 	
 	public static void main(String[] args) throws Exception
 	{

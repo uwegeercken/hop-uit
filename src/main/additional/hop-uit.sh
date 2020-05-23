@@ -5,6 +5,6 @@
 #
 # uwe.geercken@web.de - last update: 2020-05-23
 
-lib_hop_uit=hop-uit-0.1.3-SNAPSHOT.jar
+lib_hop_uit=hop-uit-0.1.4-SNAPSHOT.jar
 
 java -cp .:lib/*:${lib_hop_uit} com.datamelt.hop.uit.ImportTool "$@"

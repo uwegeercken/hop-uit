@@ -17,7 +17,9 @@
  * under the License.
  */
 package com.datamelt.hop.uit;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+
 import com.datamelt.hop.utils.Constants;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -55,7 +57,7 @@ public class PdiImporter
 	private HashMap<String, Connection> databaseConnectionTypes = Constants.getDatabaseConnectionMap();
 	private VelocityContext context;
 	private Template databaseTemplate;
-	private final static Logger logger = Logger.getLogger(PdiImporter.class);
+	private static final Logger logger = LogManager.getLogger(PdiImporter.class);
 	
 	private String outputfolderEnvironment;
 	private String outputfolderFiles;
