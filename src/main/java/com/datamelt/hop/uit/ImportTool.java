@@ -97,26 +97,26 @@ public class ImportTool
 			PdiImporter importer = new PdiImporter();
 			processArguments(importer, args);
 
-			outputfolderEnvironment = outputfolder + "/" + Constants.FOLDER_ENVIRONMENT;
-			outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
-			outputfolderDatabaseConnections = outputfolderEnvironment + "/" + Constants.HOP_METASTORE_FOLDER + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER;
-			
-			context = getVelocityContext();
-			
-			importer.setOutputfolderEnvironment(outputfolderEnvironment);
-			importer.setOutputfolderFiles(outputfolderFiles);
-			importer.setOutputfolderDatabaseConnections(outputfolderDatabaseConnections);
-			
-			// get an apache Velocity context we can use
-			importer.setVelocityContext(context);
-			
-			// template comes from the classpath
-			Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
-			importer.setVelocityTemplate(databaseTemplate);
-
-			// we need an inputfolder where all files to process are located
+			// we always need an inputfolder and an output folder
 			if(inputfolder != null && outputfolder!=null)
 			{
+				outputfolderEnvironment = outputfolder + "/" + Constants.FOLDER_ENVIRONMENT;
+				outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
+				outputfolderDatabaseConnections = outputfolderEnvironment + "/" + Constants.HOP_METASTORE_FOLDER + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER;
+				
+				context = getVelocityContext();
+				
+				importer.setOutputfolderEnvironment(outputfolderEnvironment);
+				importer.setOutputfolderFiles(outputfolderFiles);
+				importer.setOutputfolderDatabaseConnections(outputfolderDatabaseConnections);
+				
+				// get an apache Velocity context we can use
+				importer.setVelocityContext(context);
+				
+				// template comes from the classpath
+				Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
+				importer.setVelocityTemplate(databaseTemplate);
+				
 				logger.info("processing files from: " + inputfolder);
 				logger.info("output files to: " + outputfolder);
 				
@@ -163,19 +163,22 @@ public class ImportTool
 					}
 				}
 
-				// loop over files and process them
-				for(int i=0;i<files.length;i++)
+				if(files!=null)
 				{
-					int errors = importer.processFile(files[i]);
-					numberOfErrorsTotal = numberOfErrorsTotal + errors;
-					if(errors>0)
+					// loop over all files of the folder and process them
+					for(int i=0;i<files.length;i++)
 					{
-						numberOfFilesWithErrors ++;
-						logger.error("file not converted: " + files[i].getName() + ", errors in file: " + errors);
-					}
-					else
-					{
-						logger.debug("file converted: " + files[i].getName());
+						int errors = importer.processFile(files[i]);
+						numberOfErrorsTotal = numberOfErrorsTotal + errors;
+						if(errors>0)
+						{
+							numberOfFilesWithErrors ++;
+							logger.error("file not converted: " + files[i].getName() + ", errors in file: " + errors);
+						}
+						else
+						{
+							logger.debug("file converted: " + files[i].getName());
+						}
 					}
 				}
 			}
