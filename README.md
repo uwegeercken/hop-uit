@@ -2,11 +2,11 @@ Hop Ultimate Import Tool
 
 Program to convert .kjb and .ktr files created by the Pentaho Data Integration tool (PDI) into the equivalent HOP formats .hpl and .hwf.
 
-Files are read from the input folder, converted and output to the output folder. If one or multiple file names are specified, then only these files are processed from the input folder. The -f argument to specify a filename may be defined multiple times. If no file name is specified then all files in the input folder are processed. Files are not overwritten in case they already exist.
+Files are read from the input folder, converted and created in the output folder. If additionally file names are specified, then only these files are processed from the input folder. The -f argument - to specify a filename - may be defined multiple times. If no file name is specified then all files in the input folder are processed. Only ktr and kjb files are processed. Files are not overwritten in case they already exist.
 
-A folder "hop-uit-environment" is created as a Hop environment base folder. Database metadata files are created in a subfolder of this folder. After running the hop-uit tool and after the conversion of input files is complete, one can define a new environment in the Hop GUI poiting the value of "Environment base folder" to the "hop-uit-environment" folder that was created running the hop-uit tool. This way all database connection metadata files that were converted are readily available in Hop.
+A folder "hop-uit-environment" is created and represents a Hop environment base folder. Database metadata files from the conversion are created in a subfolder of this folder. If a Hop config directory is defined in a system variable HOP_CONFIG_DIRECTORY or it is specified using the -c flag, then an environment metadata file is created in this location. This will allow the user to switch to this environment from within the Hop GUI and have all converted database metadata readily available. At a later stage additional environment related features may be implemented.
 
-NOTE: Instead of creating a new environment in the Hop GUI, you can also copy the file "default_environment.xml" from the output folder to /<Hop installation folder>/config/environments/metastore/Hop Environment.
+NOTE: If no system variable HOP_CONFIG_DIRECTORY and no -c flag is specified, then the environment metadata file is created in the output folder specified. It can be copied from this folder to the folder: /[Hop installation folder]/config/environments/metastore/Hop Environment, manually at a later point in time.
 
 Adjust the log level in log4j.properties to DEBUG to receive more detailed output.
 
@@ -23,18 +23,20 @@ NOTE: You will need to change the file permissions on the hop-uit.sh script so t
 
 Usage:
 
-ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name]
+./hop-uit.sh -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[configfolder]
 where
 
 * [inputfolder]          : required. path to the folder where the ktr files are located
 * [outputfolder]         : required. path to the folder where the converted ktr files (hpl files) are output to
-* [file name]            : optional. name of a ktr file to convert. argument may be specified multiple times.
+* [file name]            : optional. name of a ktr or kjb file to convert. argument may be specified multiple times.
+* [configfolder]         : optional. path to the Hop config folder
 
 Examples:
 
-* ImportTool -i=/home/me/input -o=/home/me/output
-* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr
-* ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr
+* ./hop-uit.sh -i=/home/me/input -o=/home/me/output
+* ./hop-uit.sh -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config
+* ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile.ktr
+* ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr
 
 Please send your feedback and help to enhance the tool.
 

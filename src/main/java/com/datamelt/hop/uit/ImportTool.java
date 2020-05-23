@@ -19,6 +19,8 @@
 package com.datamelt.hop.uit;
 
 import com.datamelt.hop.utils.Constants;
+import com.datamelt.hop.utils.EnvironmentVariables;
+import com.datamelt.hop.utils.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,6 +29,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -71,14 +74,14 @@ public class ImportTool
 	
 	private static String inputfolder;
 	private static String outputfolder;
+	private static String configfolder;
 	private static String outputfolderEnvironment;
 	private static String outputfolderFiles;
 	private static String outputfolderDatabaseConnections;
 	
+	private static Map<String, String> environmentVariables;
 	private static VelocityContext context;
-	
 	private static ArrayList<String> inputFilenames = new ArrayList<>();
-	
 	private final static Logger logger = Logger.getLogger(ImportTool.class);
 	
 	public static void main(String[] args) throws Exception
@@ -94,13 +97,15 @@ public class ImportTool
 		{
 			logger.info(getVersionInfo());
 			
+			processSystemVariables();
+			
 			PdiImporter importer = new PdiImporter();
 			processArguments(importer, args);
 
 			// we always need an inputfolder and an output folder
 			if(inputfolder != null && outputfolder!=null)
 			{
-				outputfolderEnvironment = outputfolder + "/" + Constants.FOLDER_ENVIRONMENT;
+				outputfolderEnvironment = outputfolder + "/" + Constants.HOP_UIT_FOLDER_ENVIRONMENT;
 				outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
 				outputfolderDatabaseConnections = outputfolderEnvironment + "/" + Constants.HOP_METASTORE_FOLDER + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER;
 				
@@ -117,20 +122,47 @@ public class ImportTool
 				Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
 				importer.setVelocityTemplate(databaseTemplate);
 				
+				// create the output folder if not present
+				FileUtils.createFolder(outputfolderEnvironment);
+				FileUtils.createFolder(outputfolderFiles);
+				FileUtils.createFolder(outputfolderDatabaseConnections);
+				
 				logger.info("processing files from: " + inputfolder);
 				logger.info("output files to: " + outputfolder);
+				if(configfolder!=null)
+				{
+					logger.info("Hop config directory: " + configfolder);
+					
+					if(!FileUtils.existFolder(configfolder))
+					{
+						logger.warn("non existing Hop config directory will be created : " + configfolder);
+					}						
+					
+					String outputfolderEnvironmentFile = configfolder + "/" + Constants.HOP_CONFIG_FOLDER_ENVIRONMENTS + "/" + Constants.HOP_METASTORE_FOLDER + "/" + Constants.HOP_CONFIG_FOLDER_ENVIRONMENT; 
+					
+					FileUtils.createFolder(outputfolderEnvironmentFile);
+					
+					// create a default environment file
+					logger.debug("creating environment metadata file in folder: " + outputfolderEnvironmentFile);
+					createEnvironmentFile(outputfolderEnvironmentFile);
+					
+					// create environment .type file if it does not exist already
+					if(!FileUtils.existFile(outputfolderEnvironmentFile, Constants.HOP_TYPE_FILE_FILENAME))
+					{
+						logger.debug("creating .type.xml metadata file for environment in folder: " + outputfolderEnvironmentFile);
+						createTypeFile(outputfolderEnvironmentFile, Constants.HOP_TYPE_FILE_ENVIRONMENTS_TAG_NAME_VALUE);
+					}
+				}
+				else
+				{
+					// create a default environment file
+					logger.debug("creating environment metadata file in folder: " + outputfolder);
+					createEnvironmentFile(outputfolder);
+				}
 				
-				// create the output folder if not present
-				createFolder(outputfolderEnvironment);
-				createFolder(outputfolderFiles);
-				createFolder(outputfolderDatabaseConnections);
 				
 				logger.debug("creating .type.xml metadata file for database connections in folder: " + outputfolderDatabaseConnections);
-				createTypeFile(outputfolderDatabaseConnections, Constants.HOP_DATABASE_CONNECTIONS_FOLDER);
-				
-				// create a default environment file
-				logger.debug("creating environment metadata file in folder: " + outputfolderEnvironment);
-				createEnvironment();
+				createTypeFile(outputfolderDatabaseConnections, Constants.HOP_TYPE_FILE_DATABASES_TAG_NAME_VALUE);
 				
 				// array of files to process
 				File[] files = null;
@@ -216,18 +248,29 @@ public class ImportTool
 			{
 				inputFilenames.add(args[i].substring(3));
 			}
+			else if(args[i].startsWith("-c="))
+			{
+				configfolder = args[i].substring(3);
+			}
 		}
 	}
 	
 	/**
-	 * create a folder and all parent folder, if they don't exist.
+	 * process Hop variables that are available from the operating system
 	 * 
-	 * @param folder  name of the folder to create
+	 * only variables with the relevant prefix are considered
+	 * 
 	 */
-	private static void createFolder(String folder)
+	private static void processSystemVariables()
 	{
-		File f = new File(folder);
-		f.mkdirs();
+		environmentVariables = EnvironmentVariables.getVariables(Constants.HOP_SYSTEM_VARIABLES_PREFIX);
+		logger.info("system variables related to Hop: " + environmentVariables.toString());
+		
+		// check if we have the hop config directory defined in a system variable
+		if(environmentVariables.containsKey(Constants.HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY))
+		{
+			configfolder = environmentVariables.get(Constants.HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY);
+		}
 	}
 	
 	/**
@@ -246,7 +289,7 @@ public class ImportTool
 		logger.debug("merging template and type file attributes");
 		typeFileTemplate.merge( context, sw );
 		
-		File file = new File(folder + "/.type.xml");
+		File file = new File(folder + "/" + Constants.HOP_TYPE_FILE_FILENAME);
 		
 		logger.debug("writing environment metadata file: " + file.getName());
 		try (PrintStream out = new PrintStream(new FileOutputStream(file))) 
@@ -260,7 +303,7 @@ public class ImportTool
 	 * 
 	 * @param folder  name of the folder to create
 	 */
-	private static void createEnvironment() throws Exception
+	private static void createEnvironmentFile(String folder) throws Exception
 	{
 		StringWriter sw = new StringWriter();
 		
@@ -273,7 +316,7 @@ public class ImportTool
 		logger.debug("merging template and environment attributes");
 		environmentTemplate.merge( context, sw );
 		
-		File file = new File(outputfolder + "/default_environment.xml");
+		File file = new File(folder + "/hop-uit-default.xml");
 		
 		logger.debug("writing environment metadata file: " + file.getName());
 		try (PrintStream out = new PrintStream(new FileOutputStream(file))) 
@@ -316,15 +359,21 @@ public class ImportTool
 		System.out.println("Files are read from the input folder, converted and output to the output folder. If a file name is");
 		System.out.println("specified, this file is processed from the input folder. Multiple file names may be specified by");
 		System.out.println("repeating the -f argument. If no file name is specified then all files in the input folder are processed.");
-    	System.out.println();
     	System.out.println("Files are not overwritten in case they already exist");
     	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name]");
+    	System.out.println("If a HOP_CONFIG_DIRECTORY system variable is defined, it is used to create an environment metadata file");
+    	System.out.println("in this location. Alternatively the -c flag can be used to specify the Hop config directory location.");
+    	System.out.println("If both are not set, the the environment metadata file is copied to the output folder and may be copied");
+    	System.out.println("to a Hop installation later.");
+    	System.out.println();
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[configfolder]");
     	System.out.println("where [inputfolder]          : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]         : required. path to the folder where the hpl files are output to");
     	System.out.println("      [file name]            : optional. name of a .ktr file to convert - can be specified multiple times");
+    	System.out.println("      [configfolder]         : optional. path to the Hop config folder");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr");
     	System.out.println();

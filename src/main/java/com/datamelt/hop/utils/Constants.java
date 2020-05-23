@@ -24,6 +24,9 @@ import com.datamelt.hop.uit.Connection;
 
 public class Constants 
 {
+	public static final String HOP_SYSTEM_VARIABLES_PREFIX						= "HOP_";
+	public static final String HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY				= "HOP_CONFIG_DIRECTORY";
+	
 	public static final String TAG_CONNECTION									= "connection";
 	
 	public static final String TAG_CONNECTION_CHILD_NAME						= "name"; 
@@ -39,6 +42,11 @@ public class Constants
 	public static final String TAG_JOB_TAG_ACTION_TYPE							= "type";
 	
 	public static final String DATABASE_METADATA_TEMPLATE_OBJECT_KEY 			= "connection";
+	
+	public static final String HOP_TYPE_FILE_DATABASES_TAG_NAME_VALUE			= "Relational Database Connection";
+	public static final String HOP_TYPE_FILE_ENVIRONMENTS_TAG_NAME_VALUE		= "Hop Environment";
+	public static final String HOP_TYPE_FILE_ENVIRONMENTS_FILENAME				= "hop-uit-default.xml";
+	public static final String HOP_TYPE_FILE_FILENAME							= ".type.xml";
 	
 	public static final String HOP_METASTORE_FOLDER			 					= "metastore";
 	public static final String HOP_DATABASE_CONNECTIONS_FOLDER 					= "Relational Database Connection";
@@ -101,7 +109,10 @@ public class Constants
 	public static final String DATABASE_TYPE_VERTICA							= "VERTICA";
 	public static final String DATABASE_TYPE_VERTICA5							= "VERTICA5";
 	
-	public static final String FOLDER_ENVIRONMENT								= "hop-uit-environment";
+	public static final String HOP_UIT_FOLDER_ENVIRONMENT						= "hop-uit-environment";
+	public static final String HOP_UIT_ENVIRONMENT								= "hop-uit-environment";
+	public static final String HOP_CONFIG_FOLDER_ENVIRONMENTS					= "environments";
+	public static final String HOP_CONFIG_FOLDER_ENVIRONMENT					= "Hop Environment";
 	public static final String FOLDER_FILES										= "files";
 	
 	public static final int FILE_TYPE_KJB										= 0;
