@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <element>
-  <id>${environment.HOP_ENVIRONMENT|'default'}</id>
+  <id>${HOP_ENVIRONMENT|'default'}</id>
   <value/>
   <type>String</type>
   <children>
@@ -9,7 +9,7 @@
       <value>org.apache.hop.env.environment.EnvironmentVariable</value>
       <type>String</type>
       <children>
-      #foreach( $var in ${environment.HOP_ENVIRONMENT_VARIABLES.split(",")} )
+      #foreach( $var in ${HOP_ENVIRONMENT_VARIABLES.split(",")} )
         <child>
           <id>${counter|0}</id>
           <value/>
@@ -38,56 +38,56 @@
     </child>
     <child>
       <id>metaStoreBaseFolder</id>
-      <value>${environment.HOP_ENVIRONMENT_HOME_FOLDER}</value>
+      <value>${HOP_ENVIRONMENT_HOME_FOLDER}</value>
       <type>String</type>
     </child>
     <child>
       <id>description</id>
-      <value>$!{environment.HOP_ENVIRONMENT_DESCRIPTION}</value>
+      <value>$!{HOP_ENVIRONMENT_DESCRIPTION}</value>
       <type>String</type>
     </child>
     <child>
       <id>project</id>
-      <value>$!{environment.HOP_ENVIRONMENT_PROJECT}</value>
+      <value>$!{HOP_ENVIRONMENT_PROJECT}</value>
       <type>String</type>
     </child>
     <child>
       <id>company</id>
-      <value>$!{environment.HOP_ENVIRONMENT_COMPANY}</value>
+      <value>$!{HOP_ENVIRONMENT_COMPANY}</value>
       <type>String</type>
     </child>
     <child>
       <id>department</id>
-      <value>$!{environment.HOP_ENVIRONMENT_DEPARTMENT}</value>
+      <value>$!{HOP_ENVIRONMENT_DEPARTMENT}</value>
       <type>String</type>
     </child>
     <child>
       <id>unitTestsBasePath</id>
-      <value>${environment.HOP_ENVIRONMENT_HOME_FOLDER}</value>
+      <value>${HOP_ENVIRONMENT_HOME_FOLDER}</value>
       <type>String</type>
     </child>
     <child>
       <id>version</id>
-      <value>!${environment.HOP_ENVIRONMENT_VERSION}</value>
+      <value>!${HOP_ENVIRONMENT_VERSION}</value>
       <type>String</type>
     </child>
     <child>
       <id>enforce_execution_in_environment</id>
-      <value>${environment.HOP_ENVIRONMENT_ENFORCE_EXECUTION_IN_ENVIRONMENT|'N'}</value>
+      <value>${HOP_ENVIRONMENT_ENFORCE_EXECUTION_IN_ENVIRONMENT|'N'}</value>
       <type>String</type>
     </child>
     <child>
       <id>dataSetsCsvFolder</id>
-      <value>${environment.HOP_ENVIRONMENT_HOME_FOLDER}/datasets</value>
+      <value>${HOP_ENVIRONMENT_HOME_FOLDER}/datasets</value>
       <type>String</type>
     </child>
     <child>
       <id>environmentHomeFolder</id>
-      <value>${environment.HOP_ENVIRONMENT_HOME_FOLDER}</value>
+      <value>${HOP_ENVIRONMENT_HOME_FOLDER}</value>
       <type>String</type>
     </child>
   </children>
-  <name>${environment.HOP_ENVIRONMENT|'default'}</name>
+  <name>${HOP_ENVIRONMENT|'default'}</name>
   <security>
     <owner/>
     <owner-permissions-list/>

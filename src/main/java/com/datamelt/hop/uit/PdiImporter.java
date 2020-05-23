@@ -59,6 +59,7 @@ public class PdiImporter
 	
 	private String outputfolderEnvironment;
 	private String outputfolderFiles;
+	private String outputfolderDatabaseConnections;
 	
 	public int processFile(File file)
 	{
@@ -180,7 +181,7 @@ public class PdiImporter
 	
 	private void writeDatabaseMetadataFile(HashMap<String, String> connectionAttributes) throws Exception
 	{
-		File file = createDatabaseMetadataFile(connectionAttributes.get(Constants.TAG_CONNECTION_CHILD_NAME));
+		File file = new File(outputfolderDatabaseConnections + "/" + connectionAttributes.get(Constants.TAG_CONNECTION_CHILD_NAME) + ".xml");
 		
 		if(!file.exists())
 		{
@@ -203,16 +204,6 @@ public class PdiImporter
 		{
 			logger.warn("database metadata file already exists. no file generated: " + file.getName());
 		}
-	}
-	
-	private File createDatabaseMetadataFile(String connectionName)
-	{
-		File folder = new File(outputfolderEnvironment + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER);
-		folder.mkdirs();
-		
-		String fullFilename = outputfolderEnvironment + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER + "/" + connectionName + ".xml";
-		File file = new File(fullFilename);
-		return file;
 	}
 	
 	private void renameNodes(Document document)
@@ -392,4 +383,15 @@ public class PdiImporter
 	{
 		this.outputfolderFiles = outputfolderFiles;
 	}
+
+	public String getOutputfolderDatabaseConnections() 
+	{
+		return outputfolderDatabaseConnections;
+	}
+
+	public void setOutputfolderDatabaseConnections(String outputfolderDatabaseConnections) 
+	{
+		this.outputfolderDatabaseConnections = outputfolderDatabaseConnections;
+	}
+	
 }

@@ -39,10 +39,9 @@ public class Constants
 	public static final String TAG_JOB_TAG_ACTION_TYPE							= "type";
 	
 	public static final String DATABASE_METADATA_TEMPLATE_OBJECT_KEY 			= "connection";
-	public static final String HOP_DATABASE_CONNECTIONS_FOLDER 					= "metastore/Relational Database Connection";
 	
-	public static final String ENVIRONMENT_METADATA_TEMPLATE_OBJECT_KEY 		= "environment";
-	public static final String HOP_ENVIRONMENTS_FOLDER		 					= "environments/metastore/Hop Environment";
+	public static final String HOP_METASTORE_FOLDER			 					= "metastore";
+	public static final String HOP_DATABASE_CONNECTIONS_FOLDER 					= "Relational Database Connection";
 
 	public static final String PDI_TRANSFORMATION_FILENAME_EXTENSION 			= ".ktr";
 	public static final String HOP_PIPELINE_FILENAME_EXTENSION 					= ".hpl";
@@ -53,6 +52,7 @@ public class Constants
 	// loading from classpath
 	public static final String DATABASE_METADATA_VELOCITY_TEMPLATE				= "/templates/database.xml.template";
 	public static final String ENVIRONMENT_VELOCITY_TEMPLATE					= "/templates/environment.xml.template";
+	public static final String TYPEFILE_VELOCITY_TEMPLATE						= "/templates/type.xml.template";
 	
 	public static final String DATABASE_METADATA_PLUGIN_ID						= "pluginid";
 	public static final String DATABASE_METADATA_PLUGIN_NAME					= "pluginname";

@@ -21,8 +21,12 @@ package com.datamelt.hop.uit;
 import com.datamelt.hop.utils.Constants;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -62,13 +66,16 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 public class ImportTool 
 {
 	
-	private static final String version 		= "0.1.2";
-	private static final String versionDate 	= "2020-05-21";
+	private static final String version 		= "0.1.3";
+	private static final String versionDate 	= "2020-05-23";
 	
 	private static String inputfolder;
 	private static String outputfolder;
 	private static String outputfolderEnvironment;
 	private static String outputfolderFiles;
+	private static String outputfolderDatabaseConnections;
+	
+	private static VelocityContext context;
 	
 	private static ArrayList<String> inputFilenames = new ArrayList<>();
 	
@@ -92,12 +99,16 @@ public class ImportTool
 
 			outputfolderEnvironment = outputfolder + "/" + Constants.FOLDER_ENVIRONMENT;
 			outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
+			outputfolderDatabaseConnections = outputfolderEnvironment + "/" + Constants.HOP_METASTORE_FOLDER + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER;
+			
+			context = getVelocityContext();
 			
 			importer.setOutputfolderEnvironment(outputfolderEnvironment);
 			importer.setOutputfolderFiles(outputfolderFiles);
+			importer.setOutputfolderDatabaseConnections(outputfolderDatabaseConnections);
 			
 			// get an apache Velocity context we can use
-			importer.setVelocityContext(getVelocityContext());
+			importer.setVelocityContext(context);
 			
 			// template comes from the classpath
 			Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
@@ -112,7 +123,16 @@ public class ImportTool
 				// create the output folder if not present
 				createFolder(outputfolderEnvironment);
 				createFolder(outputfolderFiles);
+				createFolder(outputfolderDatabaseConnections);
 				
+				logger.debug("creating .type.xml metadata file for database connections in folder: " + outputfolderDatabaseConnections);
+				createTypeFile(outputfolderDatabaseConnections, Constants.HOP_DATABASE_CONNECTIONS_FOLDER);
+				
+				// create a default environment file
+				logger.debug("creating environment metadata file in folder: " + outputfolderEnvironment);
+				createEnvironment();
+				
+				// array of files to process
 				File[] files = null;
 				
 				// if no file names are specified then we process all files in the input folder
@@ -212,8 +232,50 @@ public class ImportTool
 	 * 
 	 * @param folder  name of the folder to create
 	 */
-	private static void createEnvironment()
+	private static void createTypeFile(String folder, String typeName) throws Exception
 	{
+		StringWriter sw = new StringWriter();
+		Template typeFileTemplate = Velocity.getTemplate(Constants.TYPEFILE_VELOCITY_TEMPLATE);
+		
+		context.put("typename",typeName);
+		context.put("typedescription","Metadata for: " + typeName);
+		
+		logger.debug("merging template and type file attributes");
+		typeFileTemplate.merge( context, sw );
+		
+		File file = new File(folder + "/.type.xml");
+		
+		logger.debug("writing environment metadata file: " + file.getName());
+		try (PrintStream out = new PrintStream(new FileOutputStream(file))) 
+		{
+			out.print(sw);
+		}
+	}
+	
+	/**
+	 * create a folder and all parent folder, if they don't exist.
+	 * 
+	 * @param folder  name of the folder to create
+	 */
+	private static void createEnvironment() throws Exception
+	{
+		StringWriter sw = new StringWriter();
+		
+		Template environmentTemplate = Velocity.getTemplate(Constants.ENVIRONMENT_VELOCITY_TEMPLATE);
+		
+		context.put("HOP_ENVIRONMENT","environment");
+		context.put("HOP_ENVIRONMENT_HOME_FOLDER",outputfolderEnvironment);
+		
+		logger.debug("merging template and environment attributes");
+		environmentTemplate.merge( context, sw );
+		
+		File file = new File(outputfolder + "/default_environment.xml");
+		
+		logger.debug("writing environment metadata file: " + file.getName());
+		try (PrintStream out = new PrintStream(new FileOutputStream(file))) 
+		{
+			out.print(sw);
+		}
 		
 	}
 	
