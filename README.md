@@ -16,7 +16,7 @@ Run a "mvn clean install" to build the package. In the folder named "target" the
 
 * a folder "lib" with all dependent libraries
 * the hop-uit library file: hop-uit-<version>.jar
-* a log4j.properties file
+* a log4j2.properties file
 * a shell script to run the tool.
 
 NOTE: You will need to change the file permissions on the hop-uit.sh script so that the file is executable.
@@ -24,9 +24,8 @@ NOTE: You will need to change the file permissions on the hop-uit.sh script so t
 Usage:
 
 ./hop-uit.sh -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[configfolder]
-where
 
-* [inputfolder]          : required. path to the folder where the ktr files are located
+* [inputfolder]          : required. path to the folder where the .ktr or .kjb files are located
 * [outputfolder]         : required. path to the folder where the converted ktr files (hpl files) are output to
 * [file name]            : optional. name of a ktr or kjb file to convert. argument may be specified multiple times.
 * [configfolder]         : optional. path to the Hop config folder
@@ -62,4 +61,4 @@ under the License.
 uwe geercken
 uwe.geercken@web.de
 
-last update: 2020-05-23
+last update: 2020-05-24
