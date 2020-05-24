@@ -4,11 +4,11 @@ Program to convert .kjb and .ktr files created by the Pentaho Data Integration t
 
 Files are read from the input folder, converted and created in the output folder. If additionally file names are specified, then only these files are processed from the input folder. The -f argument - to specify a filename - may be defined multiple times. If no file name is specified then all files in the input folder are processed. Only ktr and kjb files are processed. Files are not overwritten in case they already exist.
 
-A folder "hop-uit-environment" is created and represents a Hop environment base folder. Database metadata files from the conversion are created in a subfolder of this folder. If a Hop config directory is defined in a system variable HOP_CONFIG_DIRECTORY or it is specified using the -c flag, then an environment metadata file is created in this location. This will allow the user to switch to this environment from within the Hop GUI and have all converted database metadata readily available. At a later stage additional environment related features may be implemented.
+A folder "hop-uit-environment" is created and represents a Hop environment base folder. Database metadata files from the conversion are created in a subfolder of this folder. If a Hop config directory is defined in the system variable HOP_CONFIG_DIRECTORY or it is specified using the -c flag, then an environment metadata file is created in this location. This will allow the user to switch to this environment from within the Hop GUI and have all converted database metadata readily available. At a later stage additional environment related features may be implemented.
 
-NOTE: If no system variable HOP_CONFIG_DIRECTORY and no -c flag is specified, then the environment metadata file is created in the output folder specified. It can be copied from this folder to the folder: /[Hop installation folder]/config/environments/metastore/Hop Environment, manually at a later point in time.
+NOTE: If no system variable HOP_CONFIG_DIRECTORY and no -c flag is specified, then the environment metadata file is created in the output folder specified. It can optionally be copied from this folder to the folder: /[Hop installation folder]/config/environments/metastore/Hop Environment, manually at a later point in time. Alternatively a new environment can be defined in the Hop GUI which points to the "hop-uit-environment" folder.
 
-Adjust the log level in log4j.properties to DEBUG to receive more detailed output.
+Adjust the log level in log4j2.properties file to DEBUG to receive more detailed output.
 
 Build:
 
