@@ -47,14 +47,12 @@ import org.w3c.dom.NodeList;
 
 public class PdiImporter
 {
-	private String newFilename;
 	private int fileType;
 
 	private HashMap<String, String> replacementsKtrFile = Constants.getXmlKtrReplacementMap();
 	private HashMap<String, String> replacementsKjbFile = Constants.getXmlKjbReplacementMap();
 	private HashMap<String, String> replacementsKjbFileText = Constants.getXmlKjbTextReplacementMap();
 	
-	private HashMap<String, Connection> databaseConnectionTypes = Constants.getDatabaseConnectionMap();
 	private VelocityContext context;
 	private Template databaseTemplate;
 	private static final Logger logger = LogManager.getLogger(PdiImporter.class);
@@ -151,17 +149,19 @@ public class PdiImporter
 		
 		if(nodesJob.getLength()>0)
 		{
+			logger.debug("determined file type: kettle job file" );
 			fileType = Constants.FILE_TYPE_KJB;
 		}
 		else if(nodesTransformation.getLength()>0)
 		{
+			logger.debug("determined file type: kettle transformation file" );
 			fileType = Constants.FILE_TYPE_KTR;
 		}
 	}
 	
 	private void writeDocument(File newFile,Document document) throws Exception
 	{
-		logger.debug("writing file: " + newFilename);
+		logger.debug("writing file: " + newFile.getName());
 
 		Transformer transformer = TransformerFactory.newInstance().newTransformer();
 		Source input = new DOMSource(document);
@@ -287,9 +287,9 @@ public class PdiImporter
 
         		logger.debug("processing connection node. type: [" + pdiType + "] , name: [" + pdiName + "]");
 
-        		if(databaseConnectionTypes.containsKey(pdiType))
+        		if(Constants.getDatabaseConnectionMap().containsKey(pdiType))
         		{
-	        		Connection mappedConnection = databaseConnectionTypes.get(pdiType);
+	        		Connection mappedConnection = Constants.getDatabaseConnectionMap().get(pdiType);
 	        		
 	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_NAME, pdiName);
 	        		connectionAttributes.put(Constants.DATABASE_METADATA_PLUGIN_ID, pdiType);
@@ -331,16 +331,6 @@ public class PdiImporter
         return errors;
 	}
 
-	public HashMap<String, Connection> getDatabaseConnectionTypes() 
-	{
-		return databaseConnectionTypes;
-	}
-
-	public void setDatabaseConnectionTypes(HashMap<String, Connection> databaseConnectionTypes) 
-	{
-		this.databaseConnectionTypes = databaseConnectionTypes;
-	}
-
 	public VelocityContext getContext() 
 	{
 		return context;
@@ -354,26 +344,6 @@ public class PdiImporter
 	public void setVelocityTemplate(Template databaseTemplate) 
 	{
 		this.databaseTemplate = databaseTemplate;
-	}
-
-	public String getNewFilename() 
-	{
-		return newFilename;
-	}
-
-	public void setNewFilename(String newFilename) 
-	{
-		this.newFilename = newFilename;
-	}
-
-	public String getOutputfolderEnvironment() 
-	{
-		return outputfolderEnvironment;
-	}
-
-	public void setOutputfolderEnvironment(String outputfolderEnvironment) 
-	{
-		this.outputfolderEnvironment = outputfolderEnvironment;
 	}
 
 	public String getOutputfolderFiles() 
