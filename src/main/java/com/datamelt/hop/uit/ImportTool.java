@@ -71,8 +71,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 public class ImportTool 
 {
 	
-	private static final String version 		= "0.1.3";
-	private static final String versionDate 	= "2020-05-23";
+	private static final String version 		= "0.1.4";
+	private static final String versionDate 	= "2020-06-03";
 	
 	private static String inputfolder;
 	private static String outputfolder;
@@ -392,11 +392,11 @@ public class ImportTool
     	System.out.println();
     	System.out.println("You may optionally specify a name for the environment metadata file that will be created.");
     	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[configfolder] -e=[environment file name]");
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name]");
     	System.out.println("where [inputfolder]           : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]          : required. path to the folder where the hpl files are output to");
     	System.out.println("      [file name]             : optional. name of a .ktr file to convert - can be specified multiple times");
-    	System.out.println("      [configfolder]          : optional. path to the Hop config folder");
+    	System.out.println("      [config directory]      : optional. path to the Hop config directory");
     	System.out.println("      [environment file name] : optional. name of the environment file with xml extension");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
