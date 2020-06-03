@@ -72,7 +72,7 @@ public class PdiImporter
 		{
 			Document document = parseDocument(file);
 			
-			// check file type
+			// check file type by scanning the tags
 			determineFileType(document);
 			
 			if(fileType==Constants.FILE_TYPE_KJB)

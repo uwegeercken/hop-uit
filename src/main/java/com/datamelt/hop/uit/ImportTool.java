@@ -91,6 +91,7 @@ public class ImportTool
 	{
 		int numberOfFilesWithErrors = 0;
 		int numberOfErrorsTotal=0;
+		int filecounter=0;
 		
 		if(args.length<2 || args[0].equals("--help") || args[0].equals("-h"))
 		{
@@ -106,7 +107,7 @@ public class ImportTool
 			processArguments(importer, args);
 
 			// we always need an inputfolder and an output folder
-			if(inputfolder != null && outputfolder!=null)
+			if(inputfolder != null && FileUtils.existFolder(inputfolder) && outputfolder!=null)
 			{
 				outputfolderEnvironment = outputfolder + "/" + Constants.HOP_UIT_FOLDER_ENVIRONMENT;
 				outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
@@ -193,6 +194,7 @@ public class ImportTool
 						}
 						else
 						{
+							numberOfFilesWithErrors ++;
 							logger.info("file does not exist or cannot be read: " + file.getName());
 						}
 					}
@@ -203,28 +205,33 @@ public class ImportTool
 					// loop over all files of the folder and process them
 					for(int i=0;i<files.length;i++)
 					{
-						int errors = importer.processFile(files[i]);
-						numberOfErrorsTotal = numberOfErrorsTotal + errors;
-						if(errors>0)
+						File file = files[i];
+						if(file!=null && file.exists() && file.canRead())
 						{
-							numberOfFilesWithErrors ++;
-							logger.error("file not converted: " + files[i].getName() + ", errors in file: " + errors);
-						}
-						else
-						{
-							logger.debug("file converted: " + files[i].getName());
+							filecounter ++;
+							int errors = importer.processFile(file);
+							numberOfErrorsTotal = numberOfErrorsTotal + errors;
+							if(errors>0)
+							{
+								numberOfFilesWithErrors ++;
+								logger.error("file not converted: " + file.getName() + ", errors in file: " + errors);
+							}
+							else
+							{
+								logger.debug("file converted: " + file.getName());
+							}
 						}
 					}
 				}
+				logger.info("number of files with errors: " + numberOfFilesWithErrors);
+				logger.info("number of total errors: " + numberOfErrorsTotal);
+				logger.info("number of total files processed: " + filecounter);
 			}
 			else
 			{
-				logger.error("inputfolder and outputfolder must be specified");
+				logger.error("inputfolder must be specified and exist and outputfolder must be specified");
 			}
 		}
-		
-		logger.info("number of files with errors: " + numberOfFilesWithErrors);
-		logger.info("number of total errors: " + numberOfErrorsTotal);
 		logger.info("processing complete");
 	}
 	
