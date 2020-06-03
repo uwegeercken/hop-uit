@@ -323,7 +323,6 @@ public class ImportTool
 		context.put("HOP_ENVIRONMENT_DESCRIPTION","hop-uit-default environment");
 		context.put("HOP_ENVIRONMENT_HOME_FOLDER",outputfolderEnvironment);
 		
-		logger.debug("merging template and environment attributes");
 		environmentTemplate.merge( context, sw );
 		
 		File file = new File(folder + "/hop-uit-default.xml");
