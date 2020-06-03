@@ -115,7 +115,6 @@ public class ImportTool
 				
 				context = getVelocityContext();
 				
-				importer.setOutputfolderEnvironment(outputfolderEnvironment);
 				importer.setOutputfolderFiles(outputfolderFiles);
 				importer.setOutputfolderDatabaseConnections(outputfolderDatabaseConnections);
 				

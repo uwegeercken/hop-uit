@@ -57,7 +57,6 @@ public class PdiImporter
 	private Template databaseTemplate;
 	private static final Logger logger = LogManager.getLogger(PdiImporter.class);
 	
-	private String outputfolderEnvironment;
 	private String outputfolderFiles;
 	private String outputfolderDatabaseConnections;
 	
