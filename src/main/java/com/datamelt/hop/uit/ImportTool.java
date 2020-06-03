@@ -80,6 +80,7 @@ public class ImportTool
 	private static String outputfolderEnvironment;
 	private static String outputfolderFiles;
 	private static String outputfolderDatabaseConnections;
+	private static String environmentfileName;
 	
 	private static Map<String, String> environmentVariables;
 	private static VelocityContext context;
@@ -261,6 +262,11 @@ public class ImportTool
 			{
 				configfolder = args[i].substring(3);
 			}
+			else if(args[i].startsWith("-e="))
+			{
+				environmentfileName = args[i].substring(3);
+			}
+
 		}
 	}
 	
@@ -318,13 +324,23 @@ public class ImportTool
 		
 		Template environmentTemplate = Velocity.getTemplate(Constants.ENVIRONMENT_VELOCITY_TEMPLATE);
 		
-		context.put("HOP_ENVIRONMENT","hop-uit-default");
-		context.put("HOP_ENVIRONMENT_DESCRIPTION","hop-uit-default environment");
+		File file;
+		
+		if(environmentfileName!=null)
+		{
+			file = new File(folder + "/" + environmentfileName);
+			context.put("HOP_ENVIRONMENT",environmentfileName);
+			context.put("HOP_ENVIRONMENT_DESCRIPTION",environmentfileName);
+		}
+		else
+		{
+			file = new File(folder + "/" + Constants.HOP_TYPE_FILE_ENVIRONMENTS_FILENAME );
+			context.put("HOP_ENVIRONMENT","hop-uit-default");
+			context.put("HOP_ENVIRONMENT_DESCRIPTION","hop-uit-default environment");
+		}
 		context.put("HOP_ENVIRONMENT_HOME_FOLDER",outputfolderEnvironment);
 		
 		environmentTemplate.merge( context, sw );
-		
-		File file = new File(folder + "/hop-uit-default.xml");
 		
 		logger.debug("writing environment metadata file: " + file.getName());
 		try (PrintStream out = new PrintStream(new FileOutputStream(file))) 
@@ -374,14 +390,18 @@ public class ImportTool
     	System.out.println("If both are not set, the the environment metadata file is copied to the output folder and may be copied");
     	System.out.println("to a Hop installation later.");
     	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[configfolder]");
-    	System.out.println("where [inputfolder]          : required. path to the folder where the ktr files are located");
-    	System.out.println("      [outputfolder]         : required. path to the folder where the hpl files are output to");
-    	System.out.println("      [file name]            : optional. name of a .ktr file to convert - can be specified multiple times");
-    	System.out.println("      [configfolder]         : optional. path to the Hop config folder");
+    	System.out.println("You may optionally specify a name for the environment metadata file that will be created.");
+    	System.out.println();
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[configfolder] -e=[environment file name]");
+    	System.out.println("where [inputfolder]           : required. path to the folder where the ktr files are located");
+    	System.out.println("      [outputfolder]          : required. path to the folder where the hpl files are output to");
+    	System.out.println("      [file name]             : optional. name of a .ktr file to convert - can be specified multiple times");
+    	System.out.println("      [configfolder]          : optional. path to the Hop config folder");
+    	System.out.println("      [environment file name] : optional. name of the environment file with xml extension");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config -e=myenv-001.xml");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr");
     	System.out.println();
