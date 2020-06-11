@@ -397,7 +397,7 @@ public class ImportTool
     	System.out.println("      [outputfolder]          : required. path to the folder where the hpl files are output to");
     	System.out.println("      [file name]             : optional. name of a .ktr file to convert - can be specified multiple times");
     	System.out.println("      [config directory]      : optional. path to the Hop config directory");
-    	System.out.println("      [environment file name] : optional. name of the environment file with xml extension");
+    	System.out.println("      [environment file name] : optional. name of the environment file - with the xml extension");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config");
