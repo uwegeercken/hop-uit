@@ -19,6 +19,7 @@
 package com.datamelt.hop.utils;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * class with several helper methods
@@ -106,6 +107,26 @@ public class FileUtils
 		{
 			File folder = new File(path);
 			folder.mkdirs();
+		}
+	}
+	
+	public static void traverseFilesystem(File file, ArrayList<File> allFiles)
+	{
+		if(file.isDirectory())
+		{
+			File[] files = file.listFiles();
+			for(File folderFile : files)
+			{
+				traverseFilesystem(folderFile, allFiles);
+			}
+		}
+		else
+		{
+			if(file.getName().endsWith(".kjb")|| file.getName().endsWith(".ktr"))
+			{
+				allFiles.add(file);
+				System.out.println(file.getAbsolutePath());
+			}
 		}
 	}
 }

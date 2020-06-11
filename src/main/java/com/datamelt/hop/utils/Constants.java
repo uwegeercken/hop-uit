@@ -41,6 +41,8 @@ public class Constants
 	public static final String TAG_JOB_TAG_ACTION								= "action";
 	public static final String TAG_JOB_TAG_ACTION_TYPE							= "type";
 	
+	public static final String TAG_JOB_TAG_ENTRY								= "entry";
+	
 	public static final String DATABASE_METADATA_TEMPLATE_OBJECT_KEY 			= "connection";
 	
 	public static final String HOP_TYPE_FILE_DATABASES_TAG_NAME_VALUE			= "Relational Database Connection";
@@ -161,6 +163,20 @@ public class Constants
 	{
 		HashMap<String, String> replacements = new HashMap<>();
 	    replacements.put("TRANS", "PIPELINE");
+	    
+	    return replacements;
+	}
+	
+	/**
+	 * returns a map of partial node text replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
+	 * 
+	 * @return
+	 */
+	public static HashMap<String, String> getXmlKjbPartialTextReplacementMap()
+	{
+		HashMap<String, String> replacements = new HashMap<>();
+	    replacements.put("Internal.Job", "Internal.Workflow");
+	    replacements.put("Internal.Transformation", "Internal.Pipeline");
 	    
 	    return replacements;
 	}

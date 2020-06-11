@@ -52,6 +52,7 @@ public class PdiImporter
 	private HashMap<String, String> replacementsKtrFile = Constants.getXmlKtrReplacementMap();
 	private HashMap<String, String> replacementsKjbFile = Constants.getXmlKjbReplacementMap();
 	private HashMap<String, String> replacementsKjbFileText = Constants.getXmlKjbTextReplacementMap();
+	private HashMap<String, String> replacementsKjbFilePartialText = Constants.getXmlKjbPartialTextReplacementMap();
 	
 	private VelocityContext context;
 	private Template databaseTemplate;
@@ -79,6 +80,9 @@ public class PdiImporter
 		        
 				// process text values
 				processText(document);
+				
+				// process partial text values
+				processPartialText(document);
 				
 		        // write document only if no errors happened when trying to
 		        // create the database connection files
@@ -259,6 +263,32 @@ public class PdiImporter
         				typeNode.item(0).setTextContent(replacement);
         			}
 	        	}
+        	}
+        }
+		
+		return errors;
+	}
+	
+	private int processPartialText(Document document) throws Exception
+	{
+		int errors = 0;
+		NodeList nodes = document.getElementsByTagName("*");
+		
+		for (int i = 0; i < nodes.getLength(); i++) 
+        {
+        	Node mainNode = nodes.item(i);
+        	String nodeText = mainNode.getTextContent();
+        	if(nodeText!=null)
+        	{
+        		for(String pattern : replacementsKjbFilePartialText.keySet())
+        		{
+	        		if(nodeText.matches(".*" + pattern + ".*"))
+	        		{
+	        			String replacementText = replacementsKjbFilePartialText.get(pattern);
+	        			String newText = nodeText.replaceAll(pattern, replacementText);
+	        			mainNode.setTextContent(newText);
+	        		}
+        		}
         	}
         }
 		

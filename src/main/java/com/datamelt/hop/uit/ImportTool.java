@@ -71,8 +71,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 public class ImportTool 
 {
 	
-	private static final String version 		= "0.1.4";
-	private static final String versionDate 	= "2020-06-03";
+	private static final String version 		= "0.1.5";
+	private static final String versionDate 	= "2020-06-11";
 	
 	private static String inputfolder;
 	private static String outputfolder;
@@ -169,7 +169,7 @@ public class ImportTool
 				createTypeFile(outputfolderDatabaseConnections, Constants.HOP_TYPE_FILE_DATABASES_TAG_NAME_VALUE);
 				
 				// array of files to process
-				File[] files = null;
+				ArrayList<File> allFiles = new ArrayList<>();
 				
 				// if no file names are specified then we process all files in the input folder
 				if(inputFilenames.size() == 0)
@@ -177,20 +177,22 @@ public class ImportTool
 					File folder = new File(inputfolder);
 					if(folder.exists() && folder.canRead())
 					{
-						 files = folder.listFiles();
-						logger.info("files to process: " + files.length);
+						for(File file : folder.listFiles())
+						{
+							FileUtils.traverseFilesystem(file, allFiles);
+						}
+						logger.info("files to process: " + allFiles.size());
 					}
 				}
 				// if we have one or multiple file names
 				else
 				{
-					files = new File[inputFilenames.size()];
 					for(int i=0;i<inputFilenames.size();i++)
 					{
 						File file = new File(inputfolder + "/" + inputFilenames.get(i));
 						if(file.exists() && file.canRead())
 						{
-							files[i] = file;
+							allFiles.add(file);
 						}
 						else
 						{
@@ -200,12 +202,12 @@ public class ImportTool
 					}
 				}
 
-				if(files!=null)
+				if(allFiles!=null)
 				{
 					// loop over all files of the folder and process them
-					for(int i=0;i<files.length;i++)
+					for(int i=0;i<allFiles.size();i++)
 					{
-						File file = files[i];
+						File file = allFiles.get(i);
 						if(file!=null && file.exists() && file.canRead())
 						{
 							filecounter ++;
