@@ -290,7 +290,7 @@ public class PdiImporter
         	{
         		for(String pattern : replacementsKjbFilePartialText.keySet())
         		{
-	        		if(nodeText.matches(".*" + pattern + ".*"))
+        			if(nodeText.matches(".*" + pattern + ".*"))
 	        		{
 	        			String replacementText = replacementsKjbFilePartialText.get(pattern);
 	        			String newText = nodeText.replaceAll(pattern, replacementText);
@@ -298,6 +298,26 @@ public class PdiImporter
 	        		}
         		}
         	}
+        	// loop over subnodes
+			Element element = (Element) mainNode;
+			NodeList subNodeList = element.getElementsByTagName("*");
+			if(subNodeList.getLength()>0)
+			{
+    			for(int j=0;j<subNodeList.getLength();j++)
+    			{
+    				Node subNode = subNodeList.item(j);
+    				String subNodeText = subNode.getTextContent();
+    				for(String pattern : replacementsKjbFilePartialText.keySet())
+            		{
+	        			if(subNodeText.matches(".*" + pattern + ".*"))
+		        		{
+		        			String replacementText = replacementsKjbFilePartialText.get(pattern);
+		        			String newText = subNodeText.replaceAll(pattern, replacementText);
+		        			subNode.setTextContent(newText);
+		        		}
+            		}
+    			}
+			}
         }
 		
 		return errors;
