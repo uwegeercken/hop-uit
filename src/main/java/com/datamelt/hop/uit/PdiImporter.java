@@ -192,8 +192,10 @@ public class PdiImporter
 	private void writeDatabaseMetadataFile(HashMap<String, String> connectionAttributes) throws Exception
 	{
 		String filename = connectionAttributes.get(Constants.TAG_CONNECTION_CHILD_NAME);
-		File file = new File(outputfolderDatabaseConnections + "/" + FileUtils.correctInvalidFilename(filename) + ".xml");
+		// correct the filename if it contains invalid characters
+		String correctedFilename = FileUtils.correctInvalidFilename(filename);
 		
+		File file = new File(outputfolderDatabaseConnections + "/" + correctedFilename + ".xml");
 		if(!file.exists())
 		{
 			StringWriter sw = new StringWriter();
@@ -338,8 +340,11 @@ public class PdiImporter
 	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_USERNAME, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_USERNAME).item(0).getTextContent());
 	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_PASSWORD, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PASSWORD).item(0).getTextContent());
 	       		
-	        		// write file
 	        		writeDatabaseMetadataFile(connectionAttributes);
+	        		
+	        		// if we have corrected the filename because it contained invalid characters, then we need
+	        		// to also replace the reference in the xml file
+
         	
 	        		// capture which node was used - this node will be removed later from the xml document.
 	        		toBeRemovedNodes.add(node);

@@ -121,8 +121,7 @@ public class Constants
 	public static final int FILE_TYPE_KTR										= 1;
 	
 	/**
-	 * returns a map of invalid charcters in filenames. some charcters need to be escaped though
-	 * so a map is used 
+	 * returns a map of invalid characters in filenames and their replacement characters.
 	 * 
 	 * @return
 	 */
