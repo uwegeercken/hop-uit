@@ -112,6 +112,23 @@ public class FileUtils
 	}
 	
 	/**
+	 * create a folder for the given path
+	 * 
+	 * @param path			path to the folder
+	 * @throws Exception	exception if the folder can not be created
+	 */
+	public static void createFolder(String path, String filename) throws Exception
+	{
+		String fullPath = path.replaceAll("/" + filename, "");
+				
+		if(!existFolder(fullPath))
+		{
+			File folder = new File(fullPath);
+			folder.mkdirs();
+		}
+	}
+	
+	/**
 	 * textual information from the xml file is used to create metadata files. this information
 	 * might contain characters that are not suitable for a filename, so they need to be replaced
 	 * with valid ones
@@ -127,6 +144,24 @@ public class FileUtils
 			filename = filename.replaceAll(Pattern.quote(character), Constants.getInvalidFilenameCharacterReplacement().get(character));
 		}
 		return filename;
+	}
+	
+	public static String migrateFilename(String filename, int fileType)
+	{
+		if(fileType == Constants.FILE_TYPE_KJB)
+		{
+			return filename.replace(Constants.PDI_JOB_FILENAME_EXTENSION, Constants.HOP_WORKFLOW_FILENAME_EXTENSION);
+		}
+		else
+		{
+			return filename.replace(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION, Constants.HOP_PIPELINE_FILENAME_EXTENSION);
+		}
+	}
+	
+	public static String getFileOutputFolder(File file, String inputfolder, String outputFolder)
+	{
+		String fileRelativeFolder = file.getAbsolutePath().replaceAll(inputfolder, "");
+		return outputFolder + fileRelativeFolder;
 	}
 	
 	/**

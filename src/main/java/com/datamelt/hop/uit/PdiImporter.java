@@ -60,6 +60,7 @@ public class PdiImporter
 	private Template databaseTemplate;
 	private static final Logger logger = LogManager.getLogger(PdiImporter.class);
 	
+	private String inputfolderFiles;
 	private String outputfolderFiles;
 	private String outputfolderDatabaseConnections;
 	
@@ -90,7 +91,9 @@ public class PdiImporter
 		        // create the database connection files
 		        if(errors==0)
 		        {
-		        	File newFile = new File(getNewFilename(file.getName()));
+		        	String newFilePathAndName = FileUtils.getFileOutputFolder(file,inputfolderFiles, outputfolderFiles);
+		        	File newFile = new File(FileUtils.migrateFilename(newFilePathAndName, fileType));
+		        	FileUtils.createFolder(newFile.getAbsolutePath(),newFile.getName());
 		        	if(!newFile.exists())
 		        	{
 		        		writeDocument(newFile,document);
@@ -116,7 +119,10 @@ public class PdiImporter
 		        // create the database connection files
 		        if(errors==0)
 		        {
-		        	File newFile = new File(getNewFilename(file.getName()));
+		        	String newFilePathAndName = FileUtils.getFileOutputFolder(file,inputfolderFiles, outputfolderFiles);
+		        	
+		        	File newFile = new File(FileUtils.migrateFilename(newFilePathAndName, fileType));
+		        	FileUtils.createFolder(newFile.getAbsolutePath(),newFile.getName());
 		        	if(!newFile.exists())
 		        	{
 		        		writeDocument(newFile,document);
@@ -134,7 +140,7 @@ public class PdiImporter
 		}
 		catch(Exception ex)
 		{
-			logger.error("the file could not be parsed: " + file.getName() + ", error: " + ex.getMessage());
+			logger.error("the file could not be parsed: " + file.toString() + ", error: " + ex.getMessage());
 			errors++;
 		}
 		
@@ -175,18 +181,6 @@ public class PdiImporter
 		Source input = new DOMSource(document);
 		Result output = new StreamResult(newFile);
 		transformer.transform(input, output);
-	}
-	
-	private String getNewFilename(String filename)
-	{
-		if(fileType== Constants.FILE_TYPE_KJB)
-		{
-			return outputfolderFiles + "/" + filename.replace(Constants.PDI_JOB_FILENAME_EXTENSION, Constants.HOP_WORKFLOW_FILENAME_EXTENSION);
-		}
-		else
-		{
-			return outputfolderFiles + "/" + filename.replace(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION, Constants.HOP_PIPELINE_FILENAME_EXTENSION);
-		}
 	}
 	
 	private void writeDatabaseMetadataFile(HashMap<String, String> connectionAttributes) throws Exception
@@ -406,6 +400,16 @@ public class PdiImporter
 		this.databaseTemplate = databaseTemplate;
 	}
 
+	public String getInputfolderFiles() 
+	{
+		return inputfolderFiles;
+	}
+
+	public void setInputfolderFiles(String inputfolderFiles) 
+	{
+		this.inputfolderFiles = inputfolderFiles;
+	}
+	
 	public String getOutputfolderFiles() 
 	{
 		return outputfolderFiles;

@@ -116,6 +116,7 @@ public class ImportTool
 				
 				context = getVelocityContext();
 				
+				importer.setInputfolderFiles(inputfolder);
 				importer.setOutputfolderFiles(outputfolderFiles);
 				importer.setOutputfolderDatabaseConnections(outputfolderDatabaseConnections);
 				
@@ -396,7 +397,7 @@ public class ImportTool
     	System.out.println();
     	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name]");
     	System.out.println("where [inputfolder]           : required. path to the folder where the ktr files are located");
-    	System.out.println("      [outputfolder]          : required. path to the folder where the hpl files are output to");
+    	System.out.println("      [outputfolder]          : required. path to the folder where the hpl files are output to.");
     	System.out.println("      [file name]             : optional. name of a .ktr file to convert - can be specified multiple times");
     	System.out.println("      [config directory]      : optional. path to the Hop config directory");
     	System.out.println("      [environment file name] : optional. name of the environment file - with the xml extension");
