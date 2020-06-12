@@ -111,6 +111,15 @@ public class FileUtils
 		}
 	}
 	
+	/**
+	 * textual information from the xml file is used to create metadata files. this information
+	 * might contain characters that are not suitable for a filename, so they need to be replaced
+	 * with valid ones
+	 * 
+	 * 
+	 * @param filename	the string that shall be used as the filename
+	 * @return			a corrected version of the filename
+	 */
 	public static String correctInvalidFilename(String filename)
 	{
 		for(String character : Constants.getInvalidFilenameCharacterReplacement().keySet())
@@ -120,8 +129,16 @@ public class FileUtils
 		return filename;
 	}
 	
+	/**
+	 * recursively go over a list of files or folders and collect the
+	 * files that need to be processed
+	 * 
+	 * @param file		a file or folder
+	 * @param allFiles	array list of files collected
+	 */
 	public static void traverseFilesystem(File file, ArrayList<File> allFiles)
 	{
+		// if we have a directory, recursively loop over files or folders
 		if(file.isDirectory())
 		{
 			File[] files = file.listFiles();
@@ -130,12 +147,12 @@ public class FileUtils
 				traverseFilesystem(folderFile, allFiles);
 			}
 		}
+		// if we have a file and we can read it and it is relevant
 		else
 		{
-			if(file.canRead() && (file.getName().endsWith(".kjb")|| file.getName().endsWith(".ktr")))
+			if(file.canRead() && (file.getName().endsWith(Constants.PDI_JOB_FILENAME_EXTENSION)|| file.getName().endsWith(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION)))
 			{
 				allFiles.add(file);
-				System.out.println(file.getAbsolutePath());
 			}
 		}
 	}
