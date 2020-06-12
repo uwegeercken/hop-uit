@@ -21,6 +21,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 import com.datamelt.hop.utils.Constants;
+import com.datamelt.hop.utils.FileUtils;
+
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
@@ -107,6 +109,9 @@ public class PdiImporter
 		        // modify the connection node and write database metadata file(s)
 		        processConnectionNode(document);
 				
+		        // process partial text values
+				processPartialText(document);
+				
 		        // write document only if no errors happened when trying to
 		        // create the database connection files
 		        if(errors==0)
@@ -186,7 +191,8 @@ public class PdiImporter
 	
 	private void writeDatabaseMetadataFile(HashMap<String, String> connectionAttributes) throws Exception
 	{
-		File file = new File(outputfolderDatabaseConnections + "/" + connectionAttributes.get(Constants.TAG_CONNECTION_CHILD_NAME) + ".xml");
+		String filename = connectionAttributes.get(Constants.TAG_CONNECTION_CHILD_NAME);
+		File file = new File(outputfolderDatabaseConnections + "/" + FileUtils.correctInvalidFilename(filename) + ".xml");
 		
 		if(!file.exists())
 		{

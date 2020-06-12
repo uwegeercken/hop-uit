@@ -20,6 +20,7 @@ package com.datamelt.hop.utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * class with several helper methods
@@ -110,6 +111,15 @@ public class FileUtils
 		}
 	}
 	
+	public static String correctInvalidFilename(String filename)
+	{
+		for(String character : Constants.getInvalidFilenameCharacterReplacement().keySet())
+		{
+			filename = filename.replaceAll(Pattern.quote(character), Constants.getInvalidFilenameCharacterReplacement().get(character));
+		}
+		return filename;
+	}
+	
 	public static void traverseFilesystem(File file, ArrayList<File> allFiles)
 	{
 		if(file.isDirectory())
@@ -122,7 +132,7 @@ public class FileUtils
 		}
 		else
 		{
-			if(file.getName().endsWith(".kjb")|| file.getName().endsWith(".ktr"))
+			if(file.canRead() && (file.getName().endsWith(".kjb")|| file.getName().endsWith(".ktr")))
 			{
 				allFiles.add(file);
 				System.out.println(file.getAbsolutePath());

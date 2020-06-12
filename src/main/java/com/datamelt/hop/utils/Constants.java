@@ -121,6 +121,28 @@ public class Constants
 	public static final int FILE_TYPE_KTR										= 1;
 	
 	/**
+	 * returns a map of invalid charcters in filenames. some charcters need to be escaped though
+	 * so a map is used 
+	 * 
+	 * @return
+	 */
+	public static HashMap<String, String> getInvalidFilenameCharacterReplacement()
+	{
+		HashMap<String, String> replacements = new HashMap<>();
+	    replacements.put("<", "_");
+	    replacements.put(">", "_");
+	    replacements.put(":", "_");
+	    replacements.put("*", "_");
+	    replacements.put("\\", "_");
+	    replacements.put("/", "_");
+	    replacements.put(";", "_");
+	    replacements.put(",", "_");
+	    replacements.put("|", "_");
+	    
+	    return replacements;
+	}
+	
+	/**
 	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline 
 	 * 
 	 * @return
@@ -177,6 +199,8 @@ public class Constants
 		HashMap<String, String> replacements = new HashMap<>();
 	    replacements.put("Internal.Job", "Internal.Workflow");
 	    replacements.put("Internal.Transformation", "Internal.Pipeline");
+	    replacements.put(".ktr", ".hpl");
+	    replacements.put(".kbj", ".hwf");
 	    
 	    return replacements;
 	}
