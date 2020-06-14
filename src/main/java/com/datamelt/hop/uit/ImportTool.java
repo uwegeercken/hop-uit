@@ -182,7 +182,6 @@ public class ImportTool
 						{
 							FileUtils.traverseFilesystem(file, allFiles);
 						}
-						logger.info("files to process: " + allFiles.size());
 					}
 				}
 				// if we have one or multiple file names
@@ -205,6 +204,8 @@ public class ImportTool
 
 				if(allFiles!=null)
 				{
+					logger.info("files to process: " + allFiles.size());
+					
 					// loop over all files of the folder and process them
 					for(int i=0;i<allFiles.size();i++)
 					{
