@@ -123,7 +123,7 @@ public class Constants
 	/**
 	 * returns a map of invalid characters in filenames and their replacement characters.
 	 * 
-	 * @return
+	 * @return	map of characters and their replacements
 	 */
 	public static HashMap<String, String> getInvalidFilenameCharacterReplacement()
 	{
@@ -144,7 +144,7 @@ public class Constants
 	/**
 	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline 
 	 * 
-	 * @return
+	 * @return	map of tag names and their replacements
 	 */
 	public static HashMap<String, String> getXmlKtrReplacementMap()
 	{
@@ -161,7 +161,7 @@ public class Constants
 	/**
 	 * returns a map of replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
 	 * 
-	 * @return
+	 * @return map of tag names and their replacements
 	 */
 	public static HashMap<String, String> getXmlKjbReplacementMap()
 	{
@@ -178,7 +178,7 @@ public class Constants
 	/**
 	 * returns a map of node text replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
 	 * 
-	 * @return
+	 * @return map of xml texts and their replacements
 	 */
 	public static HashMap<String, String> getXmlKjbTextReplacementMap()
 	{
@@ -191,7 +191,7 @@ public class Constants
 	/**
 	 * returns a map of partial node text replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
 	 * 
-	 * @return
+	 * @return map of partial xml texts and their replacements
 	 */
 	public static HashMap<String, String> getXmlKjbPartialTextReplacementMap()
 	{
@@ -204,6 +204,14 @@ public class Constants
 	    return replacements;
 	}
 	
+	/**
+	 * map of database types (key) and their names and classes 
+	 * 
+	 * the value is a Connection object containing the name and the actual class.
+	 * 
+	 * 
+	 * @return map of database type mappings
+	 */
 	public static HashMap<String, Connection> getDatabaseConnectionMap()
 	{
 		HashMap<String, Connection> connectionsMap = new HashMap<>();

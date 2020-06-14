@@ -112,9 +112,11 @@ public class FileUtils
 	}
 	
 	/**
-	 * create a folder for the given path
+	 * remove the filename part from the path and then 
+	 * create the relevant folder
 	 * 
 	 * @param path			path to the folder
+	 * @param filename		name of the file
 	 * @throws Exception	exception if the folder can not be created
 	 */
 	public static void createFolder(String path, String filename) throws Exception
@@ -146,6 +148,16 @@ public class FileUtils
 		return filename;
 	}
 	
+	/**
+	 * translate Pentaho PDI filenames to the equivalent Hop ones
+	 * 
+	 * .ktr: translted to .hpl
+	 * .kjb: translated to .hwf
+	 * 
+	 * @param 	filename name of the file
+	 * @param 	fileType indicating which type the file is
+	 * @return	the translated filename
+	 */
 	public static String migrateFilename(String filename, int fileType)
 	{
 		if(fileType == Constants.FILE_TYPE_KJB)
@@ -158,6 +170,15 @@ public class FileUtils
 		}
 	}
 	
+	/**
+	 * for a given file from an input folder or subfolder thereof, determine
+	 * the correct output folder
+	 * 
+	 * @param file			name of the file without path information
+	 * @param inputfolder	name of the input folder
+	 * @param outputFolder	name of the output folder
+	 * @return				name of the output folder
+	 */
 	public static String getFileOutputFolder(File file, String inputfolder, String outputFolder)
 	{
 		String fileRelativeFolder = file.getAbsolutePath().replaceAll(inputfolder, "");

@@ -295,7 +295,9 @@ public class ImportTool
 	/**
 	 * create a folder and all parent folder, if they don't exist.
 	 * 
-	 * @param folder  name of the folder to create
+	 * @param folder  		name of the folder to create
+	 * @param typeName		name of the type to create
+	 * @throws Exception	if the type file can not be written
 	 */
 	private static void createTypeFile(String folder, String typeName) throws Exception
 	{
@@ -320,7 +322,8 @@ public class ImportTool
 	/**
 	 * create a folder and all parent folder, if they don't exist.
 	 * 
-	 * @param folder  name of the folder to create
+	 * @param folder  		name of the folder to create
+	 * @throws Exception	if the type file can not be written
 	 */
 	private static void createEnvironmentFile(String folder) throws Exception
 	{
@@ -354,6 +357,11 @@ public class ImportTool
 		
 	}
 	
+	/**
+	 * returns the version of this tool
+	 * 
+	 * @return	version of this tool
+	 */
 	private static String getVersionInfo()
 	{
 		return "Version " + version + ", last update: " + versionDate; 
