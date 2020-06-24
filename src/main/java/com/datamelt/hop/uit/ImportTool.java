@@ -19,8 +19,8 @@
 package com.datamelt.hop.uit;
 
 import com.datamelt.hop.utils.Constants;
-import com.datamelt.hop.utils.EnvironmentVariables;
 import com.datamelt.hop.utils.FileUtils;
+import com.datamelt.hop.utils.SystemVariables;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -72,7 +72,7 @@ public class ImportTool
 {
 	
 	private static final String version 		= "0.1.5";
-	private static final String versionDate 	= "2020-06-11";
+	private static final String versionDate 	= "2020-06-19";
 	
 	private static String inputfolder;
 	private static String outputfolder;
@@ -81,6 +81,7 @@ public class ImportTool
 	private static String outputfolderFiles;
 	private static String outputfolderDatabaseConnections;
 	private static String environmentfileName;
+	private static boolean environmentPerSubfolder 				= false;
 	
 	private static Map<String, String> environmentVariables;
 	private static VelocityContext context;
@@ -105,7 +106,7 @@ public class ImportTool
 			processSystemVariables();
 			
 			PdiImporter importer = new PdiImporter();
-			processArguments(importer, args);
+			processArguments(args);
 
 			// we always need an inputfolder and an output folder
 			if(inputfolder != null && FileUtils.existFolder(inputfolder) && outputfolder!=null)
@@ -245,7 +246,7 @@ public class ImportTool
 	 * @param importer	the importer to provide the arguments to
 	 * @param args		the arguments passed to this program
 	 */
-	private static void processArguments(PdiImporter importer, String[] args)
+	private static void processArguments(String[] args)
 	{
 		logger.debug("process arguments from: " + Arrays.asList(args));
 		for(int i=0;i<args.length;i++)
@@ -270,6 +271,10 @@ public class ImportTool
 			{
 				environmentfileName = args[i].substring(3);
 			}
+			else if(args[i].startsWith("-s"))
+			{
+				environmentPerSubfolder = true;
+			}
 
 		}
 	}
@@ -282,7 +287,7 @@ public class ImportTool
 	 */
 	private static void processSystemVariables()
 	{
-		environmentVariables = EnvironmentVariables.getVariables(Constants.HOP_SYSTEM_VARIABLES_PREFIX);
+		environmentVariables = SystemVariables.getVariables(Constants.HOP_SYSTEM_VARIABLES_PREFIX);
 		logger.info("system variables related to Hop: " + environmentVariables.toString());
 		
 		// check if we have the hop config directory defined in a system variable
@@ -404,12 +409,13 @@ public class ImportTool
     	System.out.println();
     	System.out.println("You may optionally specify a name for the environment metadata file that will be created.");
     	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name]");
-    	System.out.println("where [inputfolder]           : required. path to the folder where the ktr files are located");
-    	System.out.println("      [outputfolder]          : required. path to the folder where the hpl files are output to.");
-    	System.out.println("      [file name]             : optional. name of a .ktr file to convert - can be specified multiple times");
-    	System.out.println("      [config directory]      : optional. path to the Hop config directory");
-    	System.out.println("      [environment file name] : optional. name of the environment file - with the xml extension");
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name] -s=[environment per subfolder]");
+    	System.out.println("where [inputfolder]               : required. path to the folder where the ktr files are located");
+    	System.out.println("      [outputfolder]              : required. path to the folder where the hpl files are output to.");
+    	System.out.println("      [file name]                 : optional. name of a .ktr file to convert - can be specified multiple times");
+    	System.out.println("      [config directory]          : optional. path to the Hop config directory");
+    	System.out.println("      [environment file name]     : optional. name of the environment file - with the xml extension");
+    	System.out.println("      [environment per subfolder] : optional. default=false. indicator - true or false - if an environment shall be created for each subfolder");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config");

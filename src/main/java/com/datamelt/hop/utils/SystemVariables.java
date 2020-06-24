@@ -21,12 +21,12 @@ package com.datamelt.hop.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnvironmentVariables 
+public class SystemVariables 
 {
 	private static Map<String, String> variables;
 	
 	/**
-	 * Reads all environment variables into a map
+	 * Reads all system variables into a map
 	 * 
 	 */
 	static
@@ -40,9 +40,9 @@ public class EnvironmentVariables
 	}
 	
 	/**
-	 * Returns all environment variables
+	 * Returns all system variables
 	 * 
-	 * @return	all environment variables
+	 * @return	all system variables
 	 */
 	public static Map<String, String> getVariables()
 	{
@@ -50,9 +50,9 @@ public class EnvironmentVariables
 	}
 	
 	/**
-	 * Filters environment variables by a given prefix.
+	 * Filters system variables by a given prefix.
 	 * 
-	 * @param prefix			prefix the environment variables have to start with
+	 * @param prefix			prefix the system variables have to start with
 	 * @return					map of key/values for the given prefix
 	 */
 	public static Map<String, String> getVariables(String prefix)
@@ -61,14 +61,14 @@ public class EnvironmentVariables
 	}
 	
 	/**
-	 * Filters environment variables by a given prefix. 
+	 * Filters system variables by a given prefix. 
 	 * 
 	 * The prefix is removed from the key if removePrefix is set to true, but only
 	 * if the key is longer than the prefix itself.
 	 *  
 	 * Keys are converted to uppercase if keysToUpperCase is set to true. 
 	 * 
-	 * @param prefix			prefix the environment variables have to start with
+	 * @param prefix			prefix the system variables have to start with
 	 * @param removePrefix		remove the prefix from the key
 	 * @param keysToUpperCase	convert keys to uppercase
 	 * @return					map of key/values for the given prefix

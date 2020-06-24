@@ -1,0 +1,20 @@
+{
+  "description" : "$!{environment.description}",
+  "version" : "$!{environment.version}",
+  "company" : "$!{environment.company}",
+  "department" : "$!{environment.department}",
+  "project" : "$!{environment.project|'Hop UIT Import'}",
+  "metadataBaseFolder" : "$!{environment.metadataBaseFolder}",
+  "unitTestsBasePath" : "$!{environment.unitTestsBasePath}",
+  "dataSetsCsvFolder" : "$!{environment.dataSetsCsvFolder}",
+  "enforcingExecutionInHome" : $!{environment.enforcingExecutionInHome| 'false'},
+  "variables" : [
+	#foreach($variable in ${environment.variables})
+    {
+      "name" : "${variable.name}",
+      "value" : "${variable.value}",
+      "description" : "${variable.description}"
+    } #if($foreach.hasNext),#end 
+  	#end
+  ]
+}

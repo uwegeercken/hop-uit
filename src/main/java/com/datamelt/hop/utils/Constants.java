@@ -61,7 +61,7 @@ public class Constants
 	
 	// loading from classpath
 	public static final String DATABASE_METADATA_VELOCITY_TEMPLATE				= "/templates/database.xml.template";
-	public static final String ENVIRONMENT_VELOCITY_TEMPLATE					= "/templates/environment.xml.template";
+	public static final String ENVIRONMENT_VELOCITY_TEMPLATE					= "/templates/environment.json.template";
 	public static final String TYPEFILE_VELOCITY_TEMPLATE						= "/templates/type.xml.template";
 	
 	public static final String DATABASE_METADATA_PLUGIN_ID						= "pluginid";
@@ -119,6 +119,16 @@ public class Constants
 	
 	public static final int FILE_TYPE_KJB										= 0;
 	public static final int FILE_TYPE_KTR										= 1;
+	
+	public static final String BOOLEAN_TRUE_AS_STRING							= "true";
+	public static final String BOOLEAN_FALSE_AS_STRING							= "false";
+	
+	public static final String DEFAULT_ENVIRONMENT_NAME							= "default-hop-uit";
+	public static final String DEFAULT_ENVIRONMENT_METADATA_BASE_FOLDER			= "${ENVIRONMENT_HOME}/metadata";
+	public static final String DEFAULT_ENVIRONMENT_UNIT_TESTS_BASE_PATH			= "${ENVIRONMENT_HOME}";
+	public static final String DEFAULT_ENVIRONMENT_DATA_SETS_CSV_FOLDER			= "${ENVIRONMENT_HOME}/datasets";
+	
+	public static final String ENVIRONMENT_VERSION_DATE_FORMAT					= "yyyy-MM-dd";
 	
 	/**
 	 * returns a map of invalid characters in filenames and their replacement characters.

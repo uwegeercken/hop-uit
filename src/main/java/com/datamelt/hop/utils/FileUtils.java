@@ -30,6 +30,11 @@ import java.util.regex.Pattern;
  */
 public class FileUtils 
 {
+	public static String getFullName(String path, String filename)
+	{
+		return path + "/" + filename;
+	}
+	
 	/**
 	 * check if a given folder exists
 	 * 
@@ -164,9 +169,13 @@ public class FileUtils
 		{
 			return filename.replace(Constants.PDI_JOB_FILENAME_EXTENSION, Constants.HOP_WORKFLOW_FILENAME_EXTENSION);
 		}
-		else
+		else if(fileType == Constants.FILE_TYPE_KTR)
 		{
 			return filename.replace(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION, Constants.HOP_PIPELINE_FILENAME_EXTENSION);
+		}
+		else
+		{
+			return filename;
 		}
 	}
 	
@@ -211,5 +220,47 @@ public class FileUtils
 				allFiles.add(file);
 			}
 		}
+	}
+	
+	public static ArrayList<String> getSubfolders(String folder)
+	{
+		ArrayList<String> allSubfolders = new ArrayList<>();
+		File mainFolder = new File(folder);
+		if(mainFolder.isDirectory())
+		{
+			File[] files = mainFolder.listFiles();
+			for(File folderFile : files)
+			{
+				if(folderFile.isDirectory() && folderFile.canRead())
+				{
+					allSubfolders.add(folderFile.getName());
+				}
+			}
+		}
+		return allSubfolders;
+	}
+	
+	public static ArrayList<String> getFilesInInputFolder(String folder)
+	{
+		ArrayList<String> allFiles = new ArrayList<>();
+		File mainFolder = new File(folder);
+		if(mainFolder.isDirectory())
+		{
+			File[] files = mainFolder.listFiles();
+			for(File folderFile : files)
+			{
+				if(folderFile.isFile() && folderFile.canRead() && (folderFile.getName().endsWith(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION) || folderFile.getName().endsWith(Constants.PDI_JOB_FILENAME_EXTENSION) ))
+				{
+					allFiles.add(folderFile.getName());
+				}
+			}
+		}
+		return allFiles;
+	}
+	
+	public static String getFolder(String fullPath)
+	{
+		int slashPosition = fullPath.lastIndexOf("/");
+		return fullPath.substring(slashPosition +1);
 	}
 }

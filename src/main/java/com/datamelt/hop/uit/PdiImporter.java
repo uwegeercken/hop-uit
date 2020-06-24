@@ -356,10 +356,6 @@ public class PdiImporter
 	       		
 	        		writeDatabaseMetadataFile(connectionAttributes);
 	        		
-	        		// if we have corrected the filename because it contained invalid characters, then we need
-	        		// to also replace the reference in the xml file
-
-        	
 	        		// capture which node was used - this node will be removed later from the xml document.
 	        		toBeRemovedNodes.add(node);
         		}
