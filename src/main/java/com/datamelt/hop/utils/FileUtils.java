@@ -23,13 +23,18 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
- * class with several helper methods
+ * Class with several helper methods to simplify file or folder handling
  * 
  * @author uwe geercken - uwe.geercken@web.de
  *
  */
 public class FileUtils 
 {
+	public static String getFullName(String path, String filename)
+	{
+		return path + "/" + filename;
+	}
+	
 	/**
 	 * check if a given folder exists
 	 * 
@@ -149,10 +154,7 @@ public class FileUtils
 	}
 	
 	/**
-	 * translate Pentaho PDI filenames to the equivalent Hop ones
-	 * 
-	 * .ktr: translted to .hpl
-	 * .kjb: translated to .hwf
+	 * translate Pentaho PDI .ktr and .kjb filenames to the equivalent Hop ones
 	 * 
 	 * @param 	filename name of the file
 	 * @param 	fileType indicating which type the file is
@@ -164,25 +166,114 @@ public class FileUtils
 		{
 			return filename.replace(Constants.PDI_JOB_FILENAME_EXTENSION, Constants.HOP_WORKFLOW_FILENAME_EXTENSION);
 		}
-		else
+		else if(fileType == Constants.FILE_TYPE_KTR)
 		{
 			return filename.replace(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION, Constants.HOP_PIPELINE_FILENAME_EXTENSION);
+		}
+		else
+		{
+			return filename;
 		}
 	}
 	
 	/**
-	 * for a given file from an input folder or subfolder thereof, determine
-	 * the correct output folder
+	 * for a given project and translationfile determine the correct output folder
 	 * 
-	 * @param file			name of the file without path information
-	 * @param inputfolder	name of the input folder
-	 * @param outputFolder	name of the output folder
-	 * @return				name of the output folder
+	 * @param project			the relevant project
+	 * @param translationFile	the relevant translation file
+	 * @return					name of the output folder
 	 */
-	public static String getFileOutputFolder(File file, String inputfolder, String outputFolder)
+	public static String getFileOutputFolder(String outputFolder, HopProject project, TranslationFile translationFile)
 	{
-		String fileRelativeFolder = file.getAbsolutePath().replaceAll(inputfolder, "");
-		return outputFolder + fileRelativeFolder;
+		String newFolder = outputFolder;
+		if(translationFile.getRelativeOutputFolder()!=null)
+		{
+			if(project.getName().equals(Constants.DEFAULT_PROJECT_NAME))
+			{
+				newFolder = newFolder + File.separator + Constants.DEFAULT_PROJECT_NAME + File.separator + translationFile.getRelativeOutputFolder();
+			}
+			else
+			{
+				newFolder = newFolder + File.separator + translationFile.getRelativeOutputFolder();
+			}
+		}
+		else
+		{
+			newFolder = newFolder + File.separator + Constants.DEFAULT_PROJECT_NAME;
+		}
+		return newFolder;
+	}
+	
+	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder)
+	{
+		return fileParentFolder.replaceFirst(inputFolder, "");
+	}
+	
+	public static String getRootFolder(String folder)
+	{
+		if(folder!=null)
+		{
+			if(folder.startsWith(File.separator))
+			{
+				int firstPos = folder.indexOf(File.separator);
+				int secondPos = folder.indexOf(File.separator,firstPos+1);
+				if(secondPos>-1)
+				{
+					return folder.substring(0,secondPos);
+				}
+				else
+				{
+					return folder;
+				}
+			}
+			else
+			{
+				int firstPos = folder.indexOf(File.separator);
+				if(firstPos>-1)
+				{
+					return folder.substring(0,firstPos);
+				}
+				else
+				{
+					return folder;
+				}
+			}
+		}
+		else
+		{
+			return folder;
+		}
+		
+	}
+	
+	public static String removeLeadingFileSeparator(String folder)
+	{
+		if(folder.startsWith(File.separator))
+		{
+			return folder.substring(1);
+		}
+		else
+		{
+			return folder;
+		}
+	}
+	
+	public static ArrayList<String> getSubfolders(String folder)
+	{
+		ArrayList<String> allSubfolders = new ArrayList<>();
+		File mainFolder = new File(folder);
+		if(mainFolder.isDirectory())
+		{
+			File[] files = mainFolder.listFiles();
+			for(File folderFile : files)
+			{
+				if(folderFile.isDirectory() && folderFile.canRead())
+				{
+					allSubfolders.add(folderFile.getName());
+				}
+			}
+		}
+		return allSubfolders;
 	}
 	
 	/**
@@ -192,7 +283,7 @@ public class FileUtils
 	 * @param file		a file or folder
 	 * @param allFiles	array list of files collected
 	 */
-	public static void traverseFilesystem(File file, ArrayList<File> allFiles)
+	public static void traverseFilesystem(String inputFolder, File file, ArrayList<TranslationFile> allFiles)
 	{
 		// if we have a directory, recursively loop over files or folders
 		if(file.isDirectory())
@@ -200,7 +291,7 @@ public class FileUtils
 			File[] files = file.listFiles();
 			for(File folderFile : files)
 			{
-				traverseFilesystem(folderFile, allFiles);
+				traverseFilesystem(inputFolder, folderFile, allFiles);
 			}
 		}
 		// if we have a file and we can read it and it is relevant
@@ -208,7 +299,8 @@ public class FileUtils
 		{
 			if(file.canRead() && (file.getName().endsWith(Constants.PDI_JOB_FILENAME_EXTENSION)|| file.getName().endsWith(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION)))
 			{
-				allFiles.add(file);
+				String relativeOutputFolder = FileUtils.getRelativeOutputFolder(inputFolder, file.getParent());
+				allFiles.add(new TranslationFile(file, relativeOutputFolder));
 			}
 		}
 	}

@@ -20,8 +20,6 @@ package com.datamelt.hop.utils;
 
 import java.util.HashMap;
 
-import com.datamelt.hop.uit.Connection;
-
 public class Constants 
 {
 	public static final String HOP_SYSTEM_VARIABLES_PREFIX						= "HOP_";
@@ -60,8 +58,8 @@ public class Constants
 
 	
 	// loading from classpath
-	public static final String DATABASE_METADATA_VELOCITY_TEMPLATE				= "/templates/database.xml.template";
-	public static final String ENVIRONMENT_VELOCITY_TEMPLATE					= "/templates/environment.xml.template";
+	public static final String DATABASE_METADATA_VELOCITY_TEMPLATE				= "/templates/database-connection.json.template";
+	public static final String ENVIRONMENT_VELOCITY_TEMPLATE					= "/templates/environment.json.template";
 	public static final String TYPEFILE_VELOCITY_TEMPLATE						= "/templates/type.xml.template";
 	
 	public static final String DATABASE_METADATA_PLUGIN_ID						= "pluginid";
@@ -115,10 +113,27 @@ public class Constants
 	public static final String HOP_UIT_ENVIRONMENT								= "hop-uit-environment";
 	public static final String HOP_CONFIG_FOLDER_ENVIRONMENTS					= "environments";
 	public static final String HOP_CONFIG_FOLDER_ENVIRONMENT					= "Hop Environment";
+	
+	public static final String PROJECT_METADATA_FOLDER_NAME						= "metadata";
+	public static final String PROJECT_DATABASE_FOLDER_NAME						= "rdbms";
+	public static final String PROJECT_PIPELINE_RUNCONFIG_FOLDER_NAME			= "pipeline-run-configuration";
+	public static final String PROJECT_WORKFLOW_RUNCONFIG_FOLDER_NAME			= "workflow-run-configuration";
+	
 	public static final String FOLDER_FILES										= "files";
 	
 	public static final int FILE_TYPE_KJB										= 0;
 	public static final int FILE_TYPE_KTR										= 1;
+	
+	public static final String BOOLEAN_TRUE_AS_STRING							= "true";
+	public static final String BOOLEAN_FALSE_AS_STRING							= "false";
+	
+	public static final String DEFAULT_PROJECT_NAME								= "default-hop-uit";
+	public static final String DEFAULT_PROJECT_DESCRIPTION_PARTIAL				= "Hop UIT converted";
+	public static final String DEFAULT_PROJECT_METADATA_BASE_FOLDER				= "${PROJECT_HOME}/metadata";
+	public static final String DEFAULT_PROJECT_UNIT_TESTS_BASE_PATH				= "${PROJECT_HOME}";
+	public static final String DEFAULT_PROJECT_DATA_SETS_CSV_FOLDER				= "${PROJECT_HOME}/datasets";
+	
+	public static final String PROJECT_VERSION_DATE_FORMAT						= "yyyy-MM-dd";
 	
 	/**
 	 * returns a map of invalid characters in filenames and their replacement characters.
@@ -141,68 +156,7 @@ public class Constants
 	    return replacements;
 	}
 	
-	/**
-	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline 
-	 * 
-	 * @return	map of tag names and their replacements
-	 */
-	public static HashMap<String, String> getXmlKtrReplacementMap()
-	{
-		HashMap<String, String> replacements = new HashMap<>();
-	    replacements.put("transformation", "pipeline");
-	    replacements.put("trans_type", "pipeline_type");
-	    replacements.put("trans_status", "pipeline_status");
-	    replacements.put("step", "transform");
-	    replacements.put("step_error_handling", "transform_error_handling");
-	    
-	    return replacements;
-	}
 	
-	/**
-	 * returns a map of replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
-	 * 
-	 * @return map of tag names and their replacements
-	 */
-	public static HashMap<String, String> getXmlKjbReplacementMap()
-	{
-		HashMap<String, String> replacements = new HashMap<>();
-	    replacements.put("job", "workflow");
-	    replacements.put("job_version", "workflow_version");
-	    replacements.put("entries", "actions");
-	    replacements.put("entry", "action");
-	    replacements.put("job-log-table", "workflow-log-table");
-	    
-	    return replacements;
-	}
-	
-	/**
-	 * returns a map of node text replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
-	 * 
-	 * @return map of xml texts and their replacements
-	 */
-	public static HashMap<String, String> getXmlKjbTextReplacementMap()
-	{
-		HashMap<String, String> replacements = new HashMap<>();
-	    replacements.put("TRANS", "PIPELINE");
-	    
-	    return replacements;
-	}
-	
-	/**
-	 * returns a map of partial node text replacements between the Kettle/PDI format of a job and the Hop format of a workflow 
-	 * 
-	 * @return map of partial xml texts and their replacements
-	 */
-	public static HashMap<String, String> getXmlKjbPartialTextReplacementMap()
-	{
-		HashMap<String, String> replacements = new HashMap<>();
-	    replacements.put("Internal.Job", "Internal.Workflow");
-	    replacements.put("Internal.Transformation", "Internal.Pipeline");
-	    replacements.put(".ktr", ".hpl");
-	    replacements.put(".kbj", ".hwf");
-	    
-	    return replacements;
-	}
 	
 	/**
 	 * map of database types (key) and their names and classes 
@@ -219,7 +173,6 @@ public class Constants
 		connectionsMap.put(DATABASE_TYPE_APACHE_DERBY, new Connection("Apache Derby","org.apache.hop.databases.derby.DerbyDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_AS400, new Connection("AS/400","org.apache.hop.databases.as400.AS400DatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_BORLAND_INTERBASE, new Connection("Borland Interbase","org.apache.hop.databases.interbase.InterbaseDatabaseMeta"));
-		connectionsMap.put(DATABASE_TYPE_CALPOINT_INFINIDB, new Connection("Calpont InfiniDB","org.apache.hop.databases.infinidb.InfiniDbDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_DB2, new Connection("DB2","org.apache.hop.databases.db2.DB2DatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_DBASE, new Connection("dBase III, IV or 5","org.apache.hop.databases.dbase.DbaseDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_EXASOL4, new Connection("Exasol 4","org.apache.hop.databases.exasol4.Exasol4DatabaseMeta"));
@@ -230,19 +183,16 @@ public class Constants
 		connectionsMap.put(DATABASE_TYPE_GUPTA_SQL_BASE, new Connection("Gupta SQL Base","org.apache.hop.databases.sqlbase.GuptaDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_H2, new Connection("H2","org.apache.hop.databases.h2.H2DatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_HYPERSONIC, new Connection("Hypersonic","org.apache.hop.databases.hypersonic.HypersonicDatabaseMeta"));
-		connectionsMap.put(DATABASE_TYPE_INFOBRIGHT, new Connection("Infobright","org.apache.hop.databases.infobright.InfobrightDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_INFORMIX, new Connection("Informix","org.apache.hop.databases.informix.InformixDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_INGRES, new Connection("Ingres","org.apache.hop.databases.ingres.IngresDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_INGRES_VECTORWISE, new Connection("Ingres VectorWise","org.apache.hop.databases.vectorwise.VectorWiseDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_INTERSYSTEMS_CACHE, new Connection("Intersystems Cache","org.apache.hop.databases.cache.CacheDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_KINGBASEES, new Connection("KingbaseES","org.apache.hop.databases.kingbasees.KingbaseESDatabaseMeta"));
-		connectionsMap.put(DATABASE_TYPE_MARIADB, new Connection("MariaDB","org.apache.hop.databases.mariadb.MariaDBDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_SAPDB, new Connection("MaxDB (SAP DB)","org.apache.hop.databases.sapdb.SAPDBDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_MONETDB, new Connection("MonetDB","org.apache.hop.databases.monetdb.MonetDBDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_MSACCESS, new Connection("MS Access","org.apache.hop.databases.msaccess.MSAccessDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_MSSQL, new Connection("MS SQL Server","org.apache.hop.databases.mssql.MsSqlServerDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_MSSQLNATIVE, new Connection("MS SQL Server (Native)","org.apache.hop.databases.mssqlnative.MsSqlServerNativeDatabaseMeta"));
-		connectionsMap.put(DATABASE_TYPE_MYSQL, new Connection("MySQL","org.apache.hop.databases.mysql.MySqlDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_NETEZZA, new Connection("Netezza","org.apache.hop.databases.netezza.NetezzaDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_NONE, new Connection("No connection type","org.apache.hop.core.database.NoneDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_ORACLE, new Connection("Oracle","org.apache.hop.databases.oracle.OracleDatabaseMeta"));
@@ -258,6 +208,14 @@ public class Constants
 		connectionsMap.put(DATABASE_TYPE_UNIVERSE, new Connection("UniVerse database","org.apache.hop.databases.universe.UniVerseDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_VERTICA, new Connection("Vertica","org.apache.hop.databases.vertica.VerticaDatabaseMeta"));
 		connectionsMap.put(DATABASE_TYPE_VERTICA5, new Connection("Vertica 5","org.apache.hop.databases.vertica.Vertica5DatabaseMeta"));
+		
+		// the following ones have an additional databasetype attribute
+		connectionsMap.put(DATABASE_TYPE_CALPOINT_INFINIDB, new Connection("Calpont InfiniDB","org.apache.hop.databases.infinidb.InfiniDbDatabaseMeta","Mysql"));
+		connectionsMap.put(DATABASE_TYPE_INFOBRIGHT, new Connection("Infobright","org.apache.hop.databases.infobright.InfobrightDatabaseMeta","Mysql"));
+		connectionsMap.put(DATABASE_TYPE_MARIADB, new Connection("MariaDB","org.apache.hop.databases.mariadb.MariaDBDatabaseMeta","Mysql"));
+		connectionsMap.put(DATABASE_TYPE_MYSQL, new Connection("MySQL","org.apache.hop.databases.mysql.MySqlDatabaseMeta","Mysql"));
+		
+		
 		return connectionsMap;
 	}
 }

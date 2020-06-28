@@ -1,0 +1,29 @@
+{
+  "rdbms": {
+    "$!{connection.pluginId}": {
+      "odbcDsn": "$!{connection.odbcDsn}",
+      "databaseName": "$!{connection.databaseName}",
+      "pluginId": "$!{connection.pluginId}",
+      "accessType": $!{connection.accessType},
+      "hostname": "$!{connection.hostname}",
+      "password": "$!{connection.password}",
+      "port": "$!{connection.port}",
+      "pluginName": "$!{connection.pluginName}",
+      "driverClassName": "$!{connection.driverClassName}",
+      "attributes": {
+        "SUPPORTS_TIMESTAMP_DATA_TYPE": "$!{connection.attributes.supportsTimestampDataType}",
+        "QUOTE_ALL_FIELDS": "$!{connection.attributes.quoteAllFields}",
+        "STREAM_RESULTS": "$!{connection.attributes.streamResults}",
+        "SUPPORTS_BOOLEAN_DATA_TYPE": "$!{connection.attributes.supportsBooleanDataType}",
+        "FORCE_IDENTIFIERS_TO_LOWERCASE": "$!{connection.attributes.forceIdentifiersToUppercase}",
+        "PRESERVE_RESERVED_WORD_CASE": "$!{connection.attributes.preserverReservedWordCase}",
+        "SQL_CONNECT": "$!{connection.attributes.sqlConnect}",
+        "FORCE_IDENTIFIERS_TO_UPPERCASE": "$!{connection.attributes.forceIdentifiersToUppercase}",
+        "PREFERRED_SCHEMA_NAME": "$!{connection.attributes.preferredSchemaName}"
+      },
+      "manualUrl": "$!{connection.manualUrl}",
+      "username": "$!{connection.username}"
+    }
+  },
+  "name": "$!{connection.name}"
+}
