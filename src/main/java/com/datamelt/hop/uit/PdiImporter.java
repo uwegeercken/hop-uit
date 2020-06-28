@@ -52,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 /**
  * This class is the workhorse to convert a Pentaho Data Integration (PDI) .ktr or .kjb file
  * into the equivalent Hop file.
@@ -171,11 +172,23 @@ public class PdiImporter
         return errors;
 	}
 	
+	/**
+	 * returns the current document
+	 * 
+	 * @return	an XML document
+	 */
 	public Document getDocument()
 	{
 		return document;
 	}
 	
+	/**
+	 * parses the defined file which is assumed to be a Pentaho PDI .ktr or .kjb XML file
+	 * 
+	 * @param file			the file to parse
+	 * @return				an XML document
+	 * @throws Exception	when document could not be parsed
+	 */
 	private Document parseDocument(File file) throws Exception
 	{
 		logger.debug("parsing file: " + file.getName());
@@ -184,6 +197,11 @@ public class PdiImporter
         return builder.parse(file);
 	}
 	
+	/**
+	 * determine the file type by scanning the document and detecting the key nodes in the file.
+	 * 
+	 * @param document	a XML document
+	 */
 	private void determineFileType(Document document)
 	{
 		// check if file has a job tag
@@ -202,6 +220,12 @@ public class PdiImporter
 		}
 	}
 	
+	/**
+	 * write the XML document to a file
+	 * 
+	 * @param newFile		the path and file name to create 
+	 * @throws Exception	throws exception when the file can not be written
+	 */
 	private void writeDocument(File newFile) throws Exception
 	{
 		logger.debug("writing file: " + newFile.getName());
@@ -212,6 +236,13 @@ public class PdiImporter
 		transformer.transform(input, output);
 	}
 	
+	/**
+	 * writes a database connection file to the filesystem
+	 * 
+	 * @param databaseConnection	the database connection object to use
+	 * @param outputFolder			the folder to write to
+	 * @throws Exception			exception when the file can not be written
+	 */
 	private void writeDatabaseMetadataFile(HopDatabaseConnection databaseConnection, String outputFolder) throws Exception
 	{
 		String filename = databaseConnection.getName();
@@ -244,6 +275,10 @@ public class PdiImporter
 
 	}
 	
+	/**
+	 * rename the nodes in the XML document to the Hop equivalent versions 
+	 * 
+	 */
 	private void renameNodes()
 	{
 		if(fileType== Constants.FILE_TYPE_KJB)
@@ -263,6 +298,12 @@ public class PdiImporter
 		
 	}
 	
+	/**
+	 * renaming nodes from a value to a defined new value
+	 * 
+	 * @param from	value to look for
+	 * @param to	value to rename to
+	 */
 	private void renameNode(String from, String to)
 	{
 		logger.debug("renaming nodes from: [" + from + "] - to: [" + to + "]");
@@ -275,6 +316,12 @@ public class PdiImporter
         }
 	}
 	
+	/**
+	 * In some cases the text of a node/tag has to be replaced
+	 * 
+	 * @return				number of errors during processing
+	 * @throws Exception	exception when node can not be processed
+	 */
 	private int processText() throws Exception
 	{
 		int errors = 0;
@@ -302,6 +349,12 @@ public class PdiImporter
 		return errors;
 	}
 	
+	/**
+	 * in some cases partial replacement in text of a node have to be made
+	 * 
+	 * @return				number of errors during processing
+	 * @throws Exception	exception when node can not be processed
+	 */
 	private int processPartialText() throws Exception
 	{
 		int errors = 0;
@@ -348,6 +401,14 @@ public class PdiImporter
 		return errors;
 	}
 	
+	/**
+	 * determines those connections which are actually used in the document by a component
+	 * of the pipeline or workflow.	 * 
+	 * 
+	 * @param document		the document to check
+	 * @param tag			the tag to search for
+	 * @return				a set of used connections
+	 */
 	private HashSet<String> getUsedConnections(Document document, String tag)
 	{
 		HashSet<String> connectionNames = new HashSet<String>();
@@ -369,6 +430,19 @@ public class PdiImporter
 		return connectionNames;
 	}
 	
+	/**
+	 * main method to process connection information
+	 * 
+	 * the files might contain one to many connections that are not used by the file in question. The usedConnections information contains
+	 * the information which connections are actually used by the file. Only for those database connection files are created and finally
+	 * all connection information from the file is removed. In the end it only contains references to the connection files (referenced by name).
+	 * 
+	 * 
+	 * @param usedConnections	set of connections which are used by the file
+	 * @param outputFolder		the output folder to write the database connection file to
+	 * @return					number of errors during processing
+	 * @throws Exception		exception when nodes can not be processed
+	 */
 	private int processConnectionNode(HashSet<String> usedConnections, String outputFolder) throws Exception
 	{
 		int errors = 0;
@@ -439,16 +513,31 @@ public class PdiImporter
         return errors;
 	}
 
+	/**
+	 * returns the Apache Velocity context which is used
+	 * 
+	 * @return		Apache Velocity context
+	 */
 	public VelocityContext getContext() 
 	{
 		return context;
 	}
 
+	/**
+	 * sets the Apache Velocity context to the given parameter
+	 * 
+	 * @param context
+	 */
 	public void setVelocityContext(VelocityContext context) 
 	{
 		this.context = context;
 	}
 	
+	/**
+	 * sets the Apache Velocity template which is used for creating database conncetion files
+	 * 
+	 * @param databaseTemplate	Apache Velociyt template to use
+	 */
 	public void setVelocityTemplate(Template databaseTemplate) 
 	{
 		this.databaseTemplate = databaseTemplate;

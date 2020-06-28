@@ -396,7 +396,7 @@ public class ImportTool
     	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name] -s=[project per subfolder]");
     	System.out.println("where [inputfolder]               : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]              : required. path to the folder where the hpl files are output to.");
-    	System.out.println("      [file name]                 : optional. name of a .ktr file to convert - can be specified multiple times");
+    	System.out.println("      [file name]                 : optional. name of a .ktr file to convert. can be specified multiple times");
     	System.out.println("      [config directory]          : optional. path to the Hop config directory");
     	System.out.println("      [environment file name]     : optional. name of the environment file - with the xml extension");
     	System.out.println("      [project per subfolder]     : optional. default=true. indicator - true or false - if a project shall be created for each subfolder");
@@ -406,6 +406,7 @@ public class ImportTool
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config -e=myenv-001.xml");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -s=false");
     	System.out.println();
     	System.out.println("published as open source under the Apache License. read the licence notice.");
     	System.out.println("check https://github.com/uwegeercken for more");
