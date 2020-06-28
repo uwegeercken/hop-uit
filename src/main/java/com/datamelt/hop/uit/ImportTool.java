@@ -20,7 +20,10 @@ package com.datamelt.hop.uit;
 
 import com.datamelt.hop.utils.Constants;
 import com.datamelt.hop.utils.FileUtils;
+import com.datamelt.hop.utils.HopProject;
+import com.datamelt.hop.utils.HopProjectCollection;
 import com.datamelt.hop.utils.SystemVariables;
+import com.datamelt.hop.utils.TranslationFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,31 +66,30 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  * 
  * If the converted .ktr or .kjb file in the output folder already exists, then the existing file is not overwritten.
  * 
- * The tool creates a Hop environment base folder containing relevant information from the conversion, such as database metadata connection files.
+ * In any case the tool creates a default project folder containing relevant information from the conversion, such as database metadata connection files.
  * 
- * @author uwe geercken
+ * @author uwe geercken - uwe.geercken@web.de
  *
  */
 public class ImportTool 
 {
 	
-	private static final String version 		= "0.1.5";
-	private static final String versionDate 	= "2020-06-19";
+	private static final String version 					= "0.1.5";
+	private static final String versionDate 				= "2020-06-28";
 	
 	private static String inputfolder;
 	private static String outputfolder;
 	private static String configfolder;
 	private static String outputfolderEnvironment;
-	private static String outputfolderFiles;
-	private static String outputfolderDatabaseConnections;
 	private static String environmentfileName;
-	private static boolean environmentPerSubfolder 				= false;
+	private static boolean projectPerSubfolder 				= true;
 	
-	private static Map<String, String> environmentVariables;
+	private static Map<String, String> systemVariables;
 	private static VelocityContext context;
-	private static ArrayList<String> inputFilenames = new ArrayList<>();
+	private static HopProjectCollection projectCollection;
+	private static ArrayList<TranslationFile>translationFiles = new ArrayList<>();
 	
-	private static final Logger logger = LogManager.getLogger(ImportTool.class);
+	private static final Logger logger 						= LogManager.getLogger(ImportTool.class);
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -104,34 +106,32 @@ public class ImportTool
 			logger.info(getVersionInfo());
 			
 			processSystemVariables();
+			processArguments(args);
+			
+			// if we have one or multiple single files
+			if(translationFiles.size()>0)
+			{
+				projectCollection = new HopProjectCollection(inputfolder, outputfolder, false, projectPerSubfolder);
+				projectCollection.addTranslationFiles(translationFiles);
+			}
+			else
+			{
+				projectCollection = new HopProjectCollection(inputfolder, outputfolder, true, projectPerSubfolder);
+			}
+			
+			projectCollection.createProjectFolders();
 			
 			PdiImporter importer = new PdiImporter();
-			processArguments(args);
 
 			// we always need an inputfolder and an output folder
 			if(inputfolder != null && FileUtils.existFolder(inputfolder) && outputfolder!=null)
 			{
-				outputfolderEnvironment = outputfolder + "/" + Constants.HOP_UIT_FOLDER_ENVIRONMENT;
-				outputfolderFiles = outputfolder + "/" + Constants.FOLDER_FILES;
-				outputfolderDatabaseConnections = outputfolderEnvironment + "/" + Constants.HOP_METASTORE_FOLDER + "/" + Constants.HOP_DATABASE_CONNECTIONS_FOLDER;
-				
 				context = getVelocityContext();
-				
-				importer.setInputfolderFiles(inputfolder);
-				importer.setOutputfolderFiles(outputfolderFiles);
-				importer.setOutputfolderDatabaseConnections(outputfolderDatabaseConnections);
-				
-				// get an apache Velocity context we can use
 				importer.setVelocityContext(context);
 				
 				// template comes from the classpath
 				Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
 				importer.setVelocityTemplate(databaseTemplate);
-				
-				// create the output folder if not present
-				FileUtils.createFolder(outputfolderEnvironment);
-				FileUtils.createFolder(outputfolderFiles);
-				FileUtils.createFolder(outputfolderDatabaseConnections);
 				
 				logger.info("processing files from: " + inputfolder);
 				logger.info("output files to: " + outputfolder);
@@ -159,74 +159,40 @@ public class ImportTool
 						createTypeFile(outputfolderEnvironmentFile, Constants.HOP_TYPE_FILE_ENVIRONMENTS_TAG_NAME_VALUE);
 					}
 				}
-				else
-				{
-					// create a default environment file
-					logger.debug("creating environment metadata file in folder: " + outputfolder);
-					createEnvironmentFile(outputfolder);
-				}
-				
-				
-				logger.debug("creating .type.xml metadata file for database connections in folder: " + outputfolderDatabaseConnections);
-				createTypeFile(outputfolderDatabaseConnections, Constants.HOP_TYPE_FILE_DATABASES_TAG_NAME_VALUE);
-				
-				// array of files to process
-				ArrayList<File> allFiles = new ArrayList<>();
-				
-				// if no file names are specified then we process all files in the input folder
-				if(inputFilenames.size() == 0)
-				{
-					File folder = new File(inputfolder);
-					if(folder.exists() && folder.canRead())
-					{
-						for(File file : folder.listFiles())
-						{
-							FileUtils.traverseFilesystem(file, allFiles);
-						}
-					}
-				}
-				// if we have one or multiple file names
-				else
-				{
-					for(int i=0;i<inputFilenames.size();i++)
-					{
-						File file = new File(inputfolder + "/" + inputFilenames.get(i));
-						if(file.exists() && file.canRead())
-						{
-							allFiles.add(file);
-						}
-						else
-						{
-							numberOfFilesWithErrors ++;
-							logger.info("file does not exist or cannot be read: " + file.getName());
-						}
-					}
-				}
 
-				if(allFiles!=null)
+				// loop over all files if there are any
+				if(projectCollection.getNumberOfTranslationFiles() > 0)
 				{
-					logger.info("files to process: " + allFiles.size());
+					logger.info("files to process: " + projectCollection.getNumberOfTranslationFiles());
 					
-					// loop over all files of the folder and process them
-					for(int i=0;i<allFiles.size();i++)
+					// loop over all projects
+					for(String projectName : projectCollection.getProjects().keySet())
 					{
-						File file = allFiles.get(i);
-						if(file!=null && file.exists() && file.canRead())
+						HopProject project = projectCollection.getProject(projectName);
+						// loop over all files that belong to the project
+						for(int i=0;i<project.getTranslationFiles().size();i++)
 						{
-							filecounter ++;
-							int errors = importer.processFile(file);
-							numberOfErrorsTotal = numberOfErrorsTotal + errors;
-							if(errors>0)
+							TranslationFile translationFile = project.getTranslationFiles().get(i);
+							File file = new File(translationFile.getPathAndFilename());
+							if(file!=null && file.exists() && file.canRead())
 							{
-								numberOfFilesWithErrors ++;
-								logger.error("file not converted: " + file.getName() + ", errors in file: " + errors);
-							}
-							else
-							{
-								logger.debug("file converted: " + file.getName());
+								filecounter ++;
+								int errors = importer.processFile(project, translationFile, outputfolder);
+								numberOfErrorsTotal = numberOfErrorsTotal + errors;
+								if(errors>0)
+								{
+									numberOfFilesWithErrors ++;
+									logger.error("file not converted: " + file.getName() + ", errors in file: " + errors);
+								}
+								else
+								{
+									logger.debug("file converted: " + file.getName());
+								}
 							}
 						}
 					}
+					
+					
 				}
 				logger.info("number of files with errors: " + numberOfFilesWithErrors);
 				logger.info("number of total errors: " + numberOfErrorsTotal);
@@ -261,7 +227,16 @@ public class ImportTool
 			}
 			else if(args[i].startsWith("-f="))
 			{
-				inputFilenames.add(args[i].substring(3));
+				File file = new File(args[i].substring(3));
+				if(file.exists() && file.canRead())
+				{
+					String relativeOutputFolder = FileUtils.getRelativeOutputFolder(inputfolder, file.getParent());
+					translationFiles.add(new TranslationFile(file, relativeOutputFolder));
+				}
+				else
+				{
+					logger.error("file not found: " + file.getPath());
+				}
 			}
 			else if(args[i].startsWith("-c="))
 			{
@@ -271,9 +246,9 @@ public class ImportTool
 			{
 				environmentfileName = args[i].substring(3);
 			}
-			else if(args[i].startsWith("-s"))
+			else if(args[i].startsWith("-s="))
 			{
-				environmentPerSubfolder = true;
+				projectPerSubfolder = Boolean.parseBoolean(args[i].substring(3));
 			}
 
 		}
@@ -287,13 +262,13 @@ public class ImportTool
 	 */
 	private static void processSystemVariables()
 	{
-		environmentVariables = SystemVariables.getVariables(Constants.HOP_SYSTEM_VARIABLES_PREFIX);
-		logger.info("system variables related to Hop: " + environmentVariables.toString());
+		systemVariables = SystemVariables.getVariables(Constants.HOP_SYSTEM_VARIABLES_PREFIX);
+		logger.info("system variables related to Hop: " + systemVariables.toString());
 		
 		// check if we have the hop config directory defined in a system variable
-		if(environmentVariables.containsKey(Constants.HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY))
+		if(systemVariables.containsKey(Constants.HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY))
 		{
-			configfolder = environmentVariables.get(Constants.HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY);
+			configfolder = systemVariables.get(Constants.HOP_SYSTEM_VARIABLE_CONFIG_DIRECTORY);
 		}
 	}
 	
@@ -409,13 +384,13 @@ public class ImportTool
     	System.out.println();
     	System.out.println("You may optionally specify a name for the environment metadata file that will be created.");
     	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name] -s=[environment per subfolder]");
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name] -s=[project per subfolder]");
     	System.out.println("where [inputfolder]               : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]              : required. path to the folder where the hpl files are output to.");
     	System.out.println("      [file name]                 : optional. name of a .ktr file to convert - can be specified multiple times");
     	System.out.println("      [config directory]          : optional. path to the Hop config directory");
     	System.out.println("      [environment file name]     : optional. name of the environment file - with the xml extension");
-    	System.out.println("      [environment per subfolder] : optional. default=false. indicator - true or false - if an environment shall be created for each subfolder");
+    	System.out.println("      [project per subfolder]     : optional. default=true. indicator - true or false - if a project shall be created for each subfolder");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config");

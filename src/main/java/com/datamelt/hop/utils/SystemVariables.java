@@ -21,6 +21,12 @@ package com.datamelt.hop.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Holds System variables that have been detected.
+ * 
+ * @author uwe geercken - uwe.geercken@web.de
+ *
+ */
 public class SystemVariables 
 {
 	private static Map<String, String> variables;

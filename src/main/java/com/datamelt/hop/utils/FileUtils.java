@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
- * class with several helper methods
+ * Class with several helper methods to simplify file or folder handling
  * 
  * @author uwe geercken - uwe.geercken@web.de
  *
@@ -154,10 +154,7 @@ public class FileUtils
 	}
 	
 	/**
-	 * translate Pentaho PDI filenames to the equivalent Hop ones
-	 * 
-	 * .ktr: translted to .hpl
-	 * .kjb: translated to .hwf
+	 * translate Pentaho PDI .ktr and .kjb filenames to the equivalent Hop ones
 	 * 
 	 * @param 	filename name of the file
 	 * @param 	fileType indicating which type the file is
@@ -180,45 +177,73 @@ public class FileUtils
 	}
 	
 	/**
-	 * for a given file from an input folder or subfolder thereof, determine
-	 * the correct output folder
+	 * for a given project and translationfile determine the correct output folder
 	 * 
-	 * @param file			name of the file without path information
-	 * @param inputfolder	name of the input folder
-	 * @param outputFolder	name of the output folder
-	 * @return				name of the output folder
+	 * @param project			the relevant project
+	 * @param translationFile	the relevant translation file
+	 * @return					name of the output folder
 	 */
-	public static String getFileOutputFolder(File file, String inputfolder, String outputFolder)
+	public static String getFileOutputFolder(String outputFolder, HopProject project, TranslationFile translationFile)
 	{
-		String fileRelativeFolder = file.getAbsolutePath().replaceAll(inputfolder, "");
-		return outputFolder + fileRelativeFolder;
+		String newFolder = outputFolder + File.separator + project.getName() ; 
+		if(translationFile.getRelativeOutputFolder()!=null)
+		{
+			newFolder = newFolder + File.separator + translationFile.getRelativeOutputFolder();
+		}
+		return newFolder;
 	}
 	
-	/**
-	 * recursively go over a list of files or folders and collect the
-	 * files that need to be processed
-	 * 
-	 * @param file		a file or folder
-	 * @param allFiles	array list of files collected
-	 */
-	public static void traverseFilesystem(File file, ArrayList<File> allFiles)
+	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder)
 	{
-		// if we have a directory, recursively loop over files or folders
-		if(file.isDirectory())
+		return fileParentFolder.replaceFirst(inputFolder, "");
+	}
+	
+	public static String getRootFolder(String folder)
+	{
+		if(folder!=null)
 		{
-			File[] files = file.listFiles();
-			for(File folderFile : files)
+			if(folder.startsWith(File.separator))
 			{
-				traverseFilesystem(folderFile, allFiles);
+				int firstPos = folder.indexOf(File.separator);
+				int secondPos = folder.indexOf(File.separator,firstPos+1);
+				if(secondPos>-1)
+				{
+					return folder.substring(0,secondPos);
+				}
+				else
+				{
+					return folder;
+				}
+			}
+			else
+			{
+				int firstPos = folder.indexOf(File.separator);
+				if(firstPos>-1)
+				{
+					return folder.substring(0,firstPos);
+				}
+				else
+				{
+					return folder;
+				}
 			}
 		}
-		// if we have a file and we can read it and it is relevant
 		else
 		{
-			if(file.canRead() && (file.getName().endsWith(Constants.PDI_JOB_FILENAME_EXTENSION)|| file.getName().endsWith(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION)))
-			{
-				allFiles.add(file);
-			}
+			return folder;
+		}
+		
+	}
+	
+	public static String removeLeadingFileSeparator(String folder)
+	{
+		if(folder.startsWith(File.separator))
+		{
+			return folder.substring(1);
+		}
+		else
+		{
+			return folder;
 		}
 	}
 	
@@ -240,27 +265,32 @@ public class FileUtils
 		return allSubfolders;
 	}
 	
-	public static ArrayList<String> getFilesInInputFolder(String folder)
+	/**
+	 * recursively go over a list of files or folders and collect the
+	 * files that need to be processed
+	 * 
+	 * @param file		a file or folder
+	 * @param allFiles	array list of files collected
+	 */
+	public static void traverseFilesystem(String inputFolder, File file, ArrayList<TranslationFile> allFiles)
 	{
-		ArrayList<String> allFiles = new ArrayList<>();
-		File mainFolder = new File(folder);
-		if(mainFolder.isDirectory())
+		// if we have a directory, recursively loop over files or folders
+		if(file.isDirectory())
 		{
-			File[] files = mainFolder.listFiles();
+			File[] files = file.listFiles();
 			for(File folderFile : files)
 			{
-				if(folderFile.isFile() && folderFile.canRead() && (folderFile.getName().endsWith(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION) || folderFile.getName().endsWith(Constants.PDI_JOB_FILENAME_EXTENSION) ))
-				{
-					allFiles.add(folderFile.getName());
-				}
+				traverseFilesystem(inputFolder, folderFile, allFiles);
 			}
 		}
-		return allFiles;
-	}
-	
-	public static String getFolder(String fullPath)
-	{
-		int slashPosition = fullPath.lastIndexOf("/");
-		return fullPath.substring(slashPosition +1);
+		// if we have a file and we can read it and it is relevant
+		else
+		{
+			if(file.canRead() && (file.getName().endsWith(Constants.PDI_JOB_FILENAME_EXTENSION)|| file.getName().endsWith(Constants.PDI_TRANSFORMATION_FILENAME_EXTENSION)))
+			{
+				String relativeOutputFolder = FileUtils.getRelativeOutputFolder(inputFolder, file.getParent());
+				allFiles.add(new TranslationFile(file, relativeOutputFolder));
+			}
+		}
 	}
 }

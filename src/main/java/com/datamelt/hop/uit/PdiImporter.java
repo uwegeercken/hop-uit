@@ -20,8 +20,13 @@ package com.datamelt.hop.uit;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
+import com.datamelt.hop.utils.Connection;
 import com.datamelt.hop.utils.Constants;
 import com.datamelt.hop.utils.FileUtils;
+import com.datamelt.hop.utils.HopDatabaseConnection;
+import com.datamelt.hop.utils.HopProject;
+import com.datamelt.hop.utils.PdiConstants;
+import com.datamelt.hop.utils.TranslationFile;
 
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -32,6 +37,7 @@ import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -46,32 +52,41 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
+/**
+ * This class is the workhorse to convert a Pentaho Data Integration (PDI) .ktr or .kjb file
+ * into the equivalent Hop file.
+ * 
+ * Nodes are renamed, text is processed, database connections are witten to files and also
+ * partial text replacements are done.
+ * 
+ * @author uwe geercken - uwe.geercken@web.de
+ *
+ */
 public class PdiImporter
 {
 	private int fileType;
 
-	private HashMap<String, String> replacementsKtrFile = Constants.getXmlKtrReplacementMap();
-	private HashMap<String, String> replacementsKjbFile = Constants.getXmlKjbReplacementMap();
-	private HashMap<String, String> replacementsKjbFileText = Constants.getXmlKjbTextReplacementMap();
-	private HashMap<String, String> replacementsKjbFilePartialText = Constants.getXmlKjbPartialTextReplacementMap();
+	// these all hold values that have to be replaced
+	private HashMap<String, String> replacementsKtrFile = PdiConstants.getXmlKtrReplacementMap();
+	private HashMap<String, String> replacementsKjbFile = PdiConstants.getXmlKjbReplacementMap();
+	private HashMap<String, String> replacementsKjbFileText = PdiConstants.getXmlKjbTextReplacementMap();
+	private HashMap<String, String> replacementsKjbFilePartialText = PdiConstants.getXmlKjbPartialTextReplacementMap();
 	
 	private VelocityContext context;
 	private Template databaseTemplate;
+	private Document document;
 	private static final Logger logger = LogManager.getLogger(PdiImporter.class);
 	
-	private String inputfolderFiles;
-	private String outputfolderFiles;
-	private String outputfolderDatabaseConnections;
-	
-	public int processFile(File file)
+	public int processFile(HopProject project, TranslationFile translationFile, String outputFolder)
 	{
 		int errors = 0;
 		
 		// parse the file
 		try
 		{
-			Document document = parseDocument(file);
+			document = parseDocument(new File(translationFile.getPathAndFilename()));
+			
+			String newFilePath =  FileUtils.getFileOutputFolder(outputFolder, project, translationFile); 
 			
 			// check file type by scanning the tags
 			determineFileType(document);
@@ -79,53 +94,62 @@ public class PdiImporter
 			if(fileType==Constants.FILE_TYPE_KJB)
 			{
 				// rename nodes according to map
-				renameNodes(document);
+				renameNodes();
+		        
+				// get a list of connection used in the job
+				HashSet<String> usedConnections = getUsedConnections(document, PdiConstants.HOP_WORKFLOW_TAG_ACTION);
+				
+				// modify the connection node and write database metadata file(s)
+		        processConnectionNode(usedConnections, outputFolder + File.separator + project.getDatabaseConnectionsFolder());
 		        
 				// process text values
-				processText(document);
+				processText();
 				
 				// process partial text values
-				processPartialText(document);
+				processPartialText();
 				
 		        // write document only if no errors happened when trying to
 		        // create the database connection files
 		        if(errors==0)
 		        {
-		        	String newFilePathAndName = FileUtils.getFileOutputFolder(file,inputfolderFiles, outputfolderFiles);
-		        	File newFile = new File(FileUtils.migrateFilename(newFilePathAndName, fileType));
+		        	String newFileName = newFilePath + File.separator + translationFile.getFilename();
+		        	File newFile = new File(FileUtils.migrateFilename(newFileName, fileType));
 		        	FileUtils.createFolder(newFile.getAbsolutePath(),newFile.getName());
 		        	if(!newFile.exists())
 		        	{
-		        		writeDocument(newFile,document);
-		        	}
-		        	else
-		        	{
-		        		logger.warn("file already exists. no file generated: " + newFile.getName());
-		        	}
-		        }
+	        			writeDocument(newFile);
+	        		}
+	        		else
+	        		{
+	        			logger.warn("file already exists. no file generated: " + newFile.getName());
+	        		}
+	        }
 			}
 			else if(fileType==Constants.FILE_TYPE_KTR)
 			{
 				// rename nodes according to map
-				renameNodes(document);
+				renameNodes();
 		        
+				//get a list of connection used in the transformation
+				HashSet<String> usedConnections = getUsedConnections(document,PdiConstants.HOP_PIPELINE_TAG_TRANSFORM);
+				
 		        // modify the connection node and write database metadata file(s)
-		        processConnectionNode(document);
+		        processConnectionNode(usedConnections, outputFolder + File.separator + project.getDatabaseConnectionsFolder());
 				
 		        // process partial text values
-				processPartialText(document);
+				processPartialText();
 				
 		        // write document only if no errors happened when trying to
 		        // create the database connection files
 		        if(errors==0)
 		        {
-		        	String newFilePathAndName = FileUtils.getFileOutputFolder(file,inputfolderFiles, outputfolderFiles);
+		        	String newFileName = newFilePath + File.separator + translationFile.getFilename();
 		        	
-		        	File newFile = new File(FileUtils.migrateFilename(newFilePathAndName, fileType));
+		        	File newFile = new File(FileUtils.migrateFilename(newFileName, fileType));
 		        	FileUtils.createFolder(newFile.getAbsolutePath(),newFile.getName());
 		        	if(!newFile.exists())
 		        	{
-		        		writeDocument(newFile,document);
+		        		writeDocument(newFile);
 		        	}
 		        	else
 		        	{
@@ -135,16 +159,21 @@ public class PdiImporter
 			}
 			else
 			{
-				logger.warn("file is not a .kjb or .ktr file: " + file.getName());
+				logger.warn("file is not a .kjb or .ktr file: " + translationFile.getPathAndFilename());
 			}
 		}
 		catch(Exception ex)
 		{
-			logger.error("the file could not be parsed: " + file.toString() + ", error: " + ex.getMessage());
+			logger.error("the file could not be parsed: " + translationFile.getPathAndFilename() + ", error: " + ex.getMessage());
 			errors++;
 		}
 		
         return errors;
+	}
+	
+	public Document getDocument()
+	{
+		return document;
 	}
 	
 	private Document parseDocument(File file) throws Exception
@@ -173,7 +202,7 @@ public class PdiImporter
 		}
 	}
 	
-	private void writeDocument(File newFile,Document document) throws Exception
+	private void writeDocument(File newFile) throws Exception
 	{
 		logger.debug("writing file: " + newFile.getName());
 
@@ -183,24 +212,24 @@ public class PdiImporter
 		transformer.transform(input, output);
 	}
 	
-	private void writeDatabaseMetadataFile(HashMap<String, String> connectionAttributes) throws Exception
+	private void writeDatabaseMetadataFile(HopDatabaseConnection databaseConnection, String outputFolder) throws Exception
 	{
-		String filename = connectionAttributes.get(Constants.TAG_CONNECTION_CHILD_NAME);
+		String filename = databaseConnection.getName();
 		// correct the filename if it contains invalid characters
 		String correctedFilename = FileUtils.correctInvalidFilename(filename);
 		
-		File file = new File(outputfolderDatabaseConnections + "/" + correctedFilename + ".xml");
+		File file = new File(outputFolder + File.separator + correctedFilename + ".json");
+
 		if(!file.exists())
 		{
 			StringWriter sw = new StringWriter();
 			
 			context.remove(Constants.DATABASE_METADATA_TEMPLATE_OBJECT_KEY);
-			context.put( Constants.DATABASE_METADATA_TEMPLATE_OBJECT_KEY, connectionAttributes);
+			context.put( Constants.DATABASE_METADATA_TEMPLATE_OBJECT_KEY, databaseConnection);
 	
 			logger.debug("merging template and connection attributes");
 			databaseTemplate.merge( context, sw );
 	
-			
 			logger.debug("writing database metadata file: " + file.getName());
 			try (PrintStream out = new PrintStream(new FileOutputStream(file))) 
 			{
@@ -211,28 +240,30 @@ public class PdiImporter
 		{
 			logger.warn("database metadata file already exists. no file generated: " + file.getName());
 		}
+				 
+
 	}
 	
-	private void renameNodes(Document document)
+	private void renameNodes()
 	{
 		if(fileType== Constants.FILE_TYPE_KJB)
 		{
 			for(String key:replacementsKjbFile.keySet())
 	        {
-	        	renameNode(document,key,replacementsKjbFile.get(key));
+	        	renameNode(key,replacementsKjbFile.get(key));
 	        }
 		}
 		else if(fileType== Constants.FILE_TYPE_KTR)
 		{
 			for(String key:replacementsKtrFile.keySet())
 	        {
-	        	renameNode(document,key,replacementsKtrFile.get(key));
+	        	renameNode(key,replacementsKtrFile.get(key));
 	        }
 		}
 		
 	}
 	
-	private void renameNode(Document document, String from, String to)
+	private void renameNode(String from, String to)
 	{
 		logger.debug("renaming nodes from: [" + from + "] - to: [" + to + "]");
 		NodeList nodes = document.getElementsByTagName(from);
@@ -244,7 +275,7 @@ public class PdiImporter
         }
 	}
 	
-	private int processText(Document document) throws Exception
+	private int processText() throws Exception
 	{
 		int errors = 0;
 		NodeList nodes = document.getElementsByTagName(Constants.TAG_JOB_TAG_ACTION);
@@ -271,7 +302,7 @@ public class PdiImporter
 		return errors;
 	}
 	
-	private int processPartialText(Document document) throws Exception
+	private int processPartialText() throws Exception
 	{
 		int errors = 0;
 		NodeList nodes = document.getElementsByTagName("*");
@@ -317,58 +348,85 @@ public class PdiImporter
 		return errors;
 	}
 	
-	private int processConnectionNode(Document document) throws Exception
+	private HashSet<String> getUsedConnections(Document document, String tag)
+	{
+		HashSet<String> connectionNames = new HashSet<String>();
+		NodeList nodes = document.getElementsByTagName(tag);
+		for (int i = 0; i < nodes.getLength(); i++) 
+        {
+        	Node node = nodes.item(i);
+        	Element transform = (Element) node;
+        	if(transform.hasChildNodes() && transform.getChildNodes().getLength()>1)
+        	{
+        		NodeList childNodes = transform.getElementsByTagName(Constants.TAG_CONNECTION);
+        		if(childNodes.getLength()>0 && childNodes.item(0)!=null)
+        		{
+        				connectionNames.add(childNodes.item(0).getTextContent());
+        		}
+        	}
+        }
+		
+		return connectionNames;
+	}
+	
+	private int processConnectionNode(HashSet<String> usedConnections, String outputFolder) throws Exception
 	{
 		int errors = 0;
 		ArrayList<Node> toBeRemovedNodes = new ArrayList<>();
 		
 		// get all connections from the document
 		NodeList nodes = document.getElementsByTagName(Constants.TAG_CONNECTION);
+		
         for (int i = 0; i < nodes.getLength(); i++) 
         {
         	Node node = nodes.item(i);
         	Element connection = (Element) node;
         	if(connection.hasChildNodes() && connection.getChildNodes().getLength()>1)
         	{
-        		HashMap<String, String> connectionAttributes = new HashMap<>();
-
         		// type and name of the connection from the source file
         		String pdiType = connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_TYPE).item(0).getTextContent();
         		String pdiName = connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_NAME).item(0).getTextContent();
 
-        		logger.debug("processing connection node. type: [" + pdiType + "] , name: [" + pdiName + "]");
-
-        		if(Constants.getDatabaseConnectionMap().containsKey(pdiType))
+        		if(usedConnections.contains(pdiName))
         		{
-	        		Connection mappedConnection = Constants.getDatabaseConnectionMap().get(pdiType);
-	        		
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_NAME, pdiName);
-	        		connectionAttributes.put(Constants.DATABASE_METADATA_PLUGIN_ID, pdiType);
-	        		connectionAttributes.put(Constants.DATABASE_METADATA_PLUGIN_NAME, mappedConnection.getType());
-	        		
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_SERVER, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_SERVER).item(0).getTextContent());
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_ACCESS_TYPE, "0");
-	        		connectionAttributes.put(Constants.DATABASE_METADATA_POJO, mappedConnection.getDatabaseMeta());
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_DATABASE, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_DATABASE).item(0).getTextContent());
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_PORT, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PORT).item(0).getTextContent());
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_USERNAME, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_USERNAME).item(0).getTextContent());
-	        		connectionAttributes.put(Constants.TAG_CONNECTION_CHILD_PASSWORD, connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PASSWORD).item(0).getTextContent());
-	       		
-	        		writeDatabaseMetadataFile(connectionAttributes);
-	        		
-	        		// capture which node was used - this node will be removed later from the xml document.
-	        		toBeRemovedNodes.add(node);
+        		
+	        		logger.debug("processing connection node. type: [" + pdiType + "] , name: [" + pdiName + "]");
+	
+	        		if(Constants.getDatabaseConnectionMap().containsKey(pdiType))
+	        		{
+		        		Connection mappedConnection = Constants.getDatabaseConnectionMap().get(pdiType);
+		        		
+		        		HopDatabaseConnection databaseConnection = new HopDatabaseConnection(pdiType);
+		        		databaseConnection.setName(pdiName);
+		        		databaseConnection.setHostname(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_SERVER).item(0).getTextContent());
+		        		databaseConnection.setAccessType(0);
+		        		databaseConnection.setDatabaseName(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_DATABASE).item(0).getTextContent());
+		        		databaseConnection.setPort(Integer.parseInt(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PORT).item(0).getTextContent()));
+		        		databaseConnection.setUser(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_USERNAME).item(0).getTextContent());
+		        		databaseConnection.setPassword(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PASSWORD).item(0).getTextContent());
+		        		databaseConnection.setPluginName(mappedConnection.getType());
+		        		databaseConnection.setDriverClassName(mappedConnection.getDatabaseType());
+		        		
+		        		writeDatabaseMetadataFile(databaseConnection, outputFolder);
+		        		
+		        		// capture which connection node was used
+		        		toBeRemovedNodes.add(node);
+	        		}
+	        		else
+	        		{
+	        			errors++;
+	        			logger.error("unknown database type: " + pdiType);
+	        			logger.error("no database metadata file has been written for this type: " + pdiType);
+	        		}
         		}
         		else
         		{
-        			errors++;
-        			logger.error("unknown database type: " + pdiType);
-        			logger.error("no database metadata file has been written for this type: " + pdiType);
+        			toBeRemovedNodes.add(node);
         		}
         	}
         }
         
-        // remove nodes that have been converted to metadata files for hop
+        // remove nodes that have been converted to metadata files from the xml file 
         if(errors==0)
         {
 	        for (int j = 0; j < toBeRemovedNodes.size(); j++) 
@@ -395,35 +453,4 @@ public class PdiImporter
 	{
 		this.databaseTemplate = databaseTemplate;
 	}
-
-	public String getInputfolderFiles() 
-	{
-		return inputfolderFiles;
-	}
-
-	public void setInputfolderFiles(String inputfolderFiles) 
-	{
-		this.inputfolderFiles = inputfolderFiles;
-	}
-	
-	public String getOutputfolderFiles() 
-	{
-		return outputfolderFiles;
-	}
-
-	public void setOutputfolderFiles(String outputfolderFiles) 
-	{
-		this.outputfolderFiles = outputfolderFiles;
-	}
-
-	public String getOutputfolderDatabaseConnections() 
-	{
-		return outputfolderDatabaseConnections;
-	}
-
-	public void setOutputfolderDatabaseConnections(String outputfolderDatabaseConnections) 
-	{
-		this.outputfolderDatabaseConnections = outputfolderDatabaseConnections;
-	}
-	
 }

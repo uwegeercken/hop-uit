@@ -16,17 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package com.datamelt.hop.uit;
+package com.datamelt.hop.utils;
 
+/**
+ * Helper class to handle the different types of database connection
+ * which are possible in Hop.
+ * 
+ * @author uwe geercken - uwe.geercken@web.de
+ *
+ */
 public class Connection 
 {
 	private String type;
 	private String databaseMeta;
+	private String databaseType;
 	
 	public Connection(String type, String databaseMeta)
 	{
 		this.type = type;
 		this.databaseMeta = databaseMeta;
+	}
+	
+	public Connection(String type, String databaseMeta, String databaseType)
+	{
+		this.type = type;
+		this.databaseMeta = databaseMeta;
+		this.databaseType = databaseType;
 	}
 	
 	public String getType() 
@@ -47,6 +62,16 @@ public class Connection
 	public void setDatabaseMeta(String databaseMeta) 
 	{
 		this.databaseMeta = databaseMeta;
+	}
+
+	public String getDatabaseType() 
+	{
+		return databaseType;
+	}
+
+	public void setDatabaseType(String databaseType) 
+	{
+		this.databaseType = databaseType;
 	}
 	
 	
