@@ -63,7 +63,7 @@ import org.w3c.dom.NodeList;
  * @author uwe geercken - uwe.geercken@web.de
  *
  */
-public class PdiImporter
+public class PdiConverter
 {
 	private int fileType;
 
@@ -76,7 +76,7 @@ public class PdiImporter
 	private VelocityContext context;
 	private Template databaseTemplate;
 	private Document document;
-	private static final Logger logger = LogManager.getLogger(PdiImporter.class);
+	private static final Logger logger = LogManager.getLogger(PdiConverter.class);
 	
 	public int processFile(HopProject project, TranslationFile translationFile, String outputFolder)
 	{

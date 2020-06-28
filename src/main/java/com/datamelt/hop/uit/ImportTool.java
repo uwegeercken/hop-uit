@@ -73,7 +73,6 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  */
 public class ImportTool 
 {
-	
 	private static final String version 					= "0.1.5";
 	private static final String versionDate 				= "2020-06-28";
 	
@@ -121,7 +120,7 @@ public class ImportTool
 			
 			projectCollection.createProjectFolders();
 			
-			PdiImporter importer = new PdiImporter();
+			PdiConverter importer = new PdiConverter();
 
 			// we always need an inputfolder and an output folder
 			if(inputfolder != null && FileUtils.existFolder(inputfolder) && outputfolder!=null)
