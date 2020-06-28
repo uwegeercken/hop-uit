@@ -24,14 +24,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 
 /**
- * Collects and creates all projects that are created during the conversion process.
+ * Collects and uses all projects that are created during the conversion process.
  * 
  * @author uwe geercken - uwe.geercken@web.de
  *
@@ -45,8 +43,6 @@ public class HopProjectCollection
 	private String inputFolder;
 	private String outputFolder;
 	private boolean projectPerSubfolder;
-	
-	private static final Logger logger = LogManager.getLogger(HopProjectCollection.class);
 	
 	public HopProjectCollection(String inputFolder, String outputFolder, boolean processAllFiles, boolean projectPerSubfolder) throws Exception
 	{
