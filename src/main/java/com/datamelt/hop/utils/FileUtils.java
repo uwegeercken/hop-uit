@@ -30,6 +30,13 @@ import java.util.regex.Pattern;
  */
 public class FileUtils 
 {
+	/**
+	 * construct the full name of a file by concatenating path and filename
+	 * 
+	 * @param path			the path to the file
+	 * @param filename		the name of the file
+	 * @return				the full path and name of the file
+	 */
 	public static String getFullName(String path, String filename)
 	{
 		return path + "/" + filename;
@@ -204,11 +211,27 @@ public class FileUtils
 		return newFolder;
 	}
 	
+	/**
+	 * determines the relative folder of the file compared to the input folder. it will be used
+	 * to write the ouput file to the same relativ folder compared to the output folder.
+	 * 
+	 * @param inputFolder			the input folder of the files
+	 * @param fileParentFolder		the parent folder of the file
+	 * @return						the relativ folder compared to the input folder
+	 */
 	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder)
 	{
 		return fileParentFolder.replaceFirst(inputFolder, "");
 	}
 	
+	/**
+	 * get the root folder of a given folder. the root folder is the first folder in the files
+	 * relativ folder hierarchy. This folder corresponds to the name of the project the file
+	 * is located in
+	 * 
+	 * @param folder	the relative folder of a file
+	 * @return			the root folder of the relative folder
+	 */
 	public static String getRootFolder(String folder)
 	{
 		if(folder!=null)
@@ -246,6 +269,13 @@ public class FileUtils
 		
 	}
 	
+	/**
+	 * remove a leading file separator of a given folder
+	 * 
+	 * 
+	 * @param folder	the folder
+	 * @return			the folder without a leading file separator
+	 */
 	public static String removeLeadingFileSeparator(String folder)
 	{
 		if(folder.startsWith(File.separator))
@@ -258,6 +288,13 @@ public class FileUtils
 		}
 	}
 	
+	/**
+	 * get the list of subfolders. These are the folders that are directly located in the input folder.
+	 * These folders are used to create projects in which the files will be collected.
+	 * 
+	 * @param folder	the input folder
+	 * @return			list ofg subfolders
+	 */
 	public static ArrayList<String> getSubfolders(String folder)
 	{
 		ArrayList<String> allSubfolders = new ArrayList<>();
