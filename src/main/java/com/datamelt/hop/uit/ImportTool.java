@@ -169,11 +169,13 @@ public class ImportTool
 					for(String projectName : projectCollection.getProjects().keySet())
 					{
 						HopProject project = projectCollection.getProject(projectName);
+						logger.info("processing project: " + projectName + " - files: " + project.getNumberOfTranslationFiles());
 						// loop over all files that belong to the project
 						for(int i=0;i<project.getTranslationFiles().size();i++)
 						{
 							TranslationFile translationFile = project.getTranslationFiles().get(i);
 							File file = new File(translationFile.getPathAndFilename());
+							logger.debug("processing file: " + translationFile.getPathAndFilename());
 							if(file!=null && file.exists() && file.canRead())
 							{
 								filecounter ++;
@@ -374,8 +376,15 @@ public class ImportTool
 		System.out.println("Program to convert files created by the Pentaho Data Integration tool (PDI) into the HOP format.");
 		System.out.println("Files are read from the input folder, converted and output to the output folder. If a file name is");
 		System.out.println("specified, this file is processed from the input folder. Multiple file names may be specified by");
-		System.out.println("repeating the -f argument. If no file name is specified then all files in the input folder are processed.");
-    	System.out.println("Files are not overwritten in case they already exist");
+		System.out.println("repeating the -f argument. If no file name is specified then all files in the input folder are processed");
+		System.out.println("recursively. Files are not overwritten in case they already exist");
+    	System.out.println();
+    	System.out.println("Per default the tool creates one project for each subfolder in the specified inputfolder. The project name");
+    	System.out.println("corresponds to the name of the folder. Each of these project folders contains the converted files and");
+    	System.out.println("a metadata folder with all database connections that are relevant to the converted files of the project.");
+    	System.out.println("Files that are not located in any folder - in the inputfolder directly - are output to a default project folder.");
+    	System.out.println("If the argument [project per subfolder] is set to false, then all converted files and database connections");
+    	System.out.println("are output to a default project folder.");
     	System.out.println();
     	System.out.println("If a HOP_CONFIG_DIRECTORY system variable is defined, it is used to create an environment metadata file");
     	System.out.println("in this location. Alternatively the -c flag can be used to specify the Hop config directory location.");

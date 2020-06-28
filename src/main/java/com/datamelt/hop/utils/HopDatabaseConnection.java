@@ -36,7 +36,7 @@ public class HopDatabaseConnection
 	private String hostname;
 	private String user;
 	private String password;
-	private int port;
+	private String port;
 	private String pluginName;
 	private String driverClassName;
 	
@@ -121,12 +121,12 @@ public class HopDatabaseConnection
 		this.password = password;
 	}
 
-	public int getPort() 
+	public String getPort() 
 	{
 		return port;
 	}
 
-	public void setPort(int port) 
+	public void setPort(String port) 
 	{
 		this.port = port;
 	}

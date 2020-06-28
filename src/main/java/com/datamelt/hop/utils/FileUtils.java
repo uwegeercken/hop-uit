@@ -185,10 +185,21 @@ public class FileUtils
 	 */
 	public static String getFileOutputFolder(String outputFolder, HopProject project, TranslationFile translationFile)
 	{
-		String newFolder = outputFolder + File.separator + project.getName() ; 
+		String newFolder = outputFolder;
 		if(translationFile.getRelativeOutputFolder()!=null)
 		{
-			newFolder = newFolder + File.separator + translationFile.getRelativeOutputFolder();
+			if(project.getName().equals(Constants.DEFAULT_PROJECT_NAME))
+			{
+				newFolder = newFolder + File.separator + Constants.DEFAULT_PROJECT_NAME + File.separator + translationFile.getRelativeOutputFolder();
+			}
+			else
+			{
+				newFolder = newFolder + File.separator + translationFile.getRelativeOutputFolder();
+			}
+		}
+		else
+		{
+			newFolder = newFolder + File.separator + Constants.DEFAULT_PROJECT_NAME;
 		}
 		return newFolder;
 	}

@@ -92,14 +92,17 @@ public class HopProjectCollection
 		for(String projectName : projects.keySet())
 		{
 			HopProject project = projects.get(projectName);
-			FileUtils.createFolder(project.getHomeFolder());
-			
-			String metadataFolder = project.getHomeFolder() + File.separator + Constants.PROJECT_METADATA_FOLDER_NAME;
-			
-			FileUtils.createFolder(metadataFolder);
-			FileUtils.createFolder(metadataFolder + File.separator + Constants.PROJECT_DATABASE_FOLDER_NAME);
-			FileUtils.createFolder(metadataFolder + File.separator + Constants.PROJECT_PIPELINE_RUNCONFIG_FOLDER_NAME);
-			FileUtils.createFolder(metadataFolder + File.separator + Constants.PROJECT_WORKFLOW_RUNCONFIG_FOLDER_NAME);
+			if(project.getNumberOfTranslationFiles()>0)
+			{
+				FileUtils.createFolder(project.getHomeFolder());
+				
+				String metadataFolder = project.getHomeFolder() + File.separator + Constants.PROJECT_METADATA_FOLDER_NAME;
+				
+				FileUtils.createFolder(metadataFolder);
+				FileUtils.createFolder(metadataFolder + File.separator + Constants.PROJECT_DATABASE_FOLDER_NAME);
+				//FileUtils.createFolder(metadataFolder + File.separator + Constants.PROJECT_PIPELINE_RUNCONFIG_FOLDER_NAME);
+				//FileUtils.createFolder(metadataFolder + File.separator + Constants.PROJECT_WORKFLOW_RUNCONFIG_FOLDER_NAME);
+			}
 		}
 
 	}
@@ -130,10 +133,10 @@ public class HopProjectCollection
 	
 	public void addFileToProject(TranslationFile translationFile)
 	{
-		String relativeFolder = translationFile.getRelativeOutputFolder();
-		if(relativeFolder!=null && projects.containsKey(relativeFolder))
+		String relativeFolderRoot = translationFile.getRelativeOutputRootFolder();
+		if(relativeFolderRoot!=null && projects.containsKey(relativeFolderRoot))
 		{
-			HopProject project = projects.get(relativeFolder);
+			HopProject project = projects.get(relativeFolderRoot);
 			project.addTranslationFile(translationFile);
 		}
 		else

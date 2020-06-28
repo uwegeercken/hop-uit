@@ -238,7 +238,7 @@ public class PdiImporter
 		}
 		else
 		{
-			logger.warn("database metadata file already exists. no file generated: " + file.getName());
+			logger.debug("database metadata file already exists. no file generated: " + file.getName());
 		}
 				 
 
@@ -401,7 +401,7 @@ public class PdiImporter
 		        		databaseConnection.setHostname(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_SERVER).item(0).getTextContent());
 		        		databaseConnection.setAccessType(0);
 		        		databaseConnection.setDatabaseName(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_DATABASE).item(0).getTextContent());
-		        		databaseConnection.setPort(Integer.parseInt(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PORT).item(0).getTextContent()));
+		        		databaseConnection.setPort(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PORT).item(0).getTextContent());
 		        		databaseConnection.setUser(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_USERNAME).item(0).getTextContent());
 		        		databaseConnection.setPassword(connection.getElementsByTagName(Constants.TAG_CONNECTION_CHILD_PASSWORD).item(0).getTextContent());
 		        		databaseConnection.setPluginName(mappedConnection.getType());
