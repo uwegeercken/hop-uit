@@ -185,6 +185,4 @@ public class HopDatabaseConnection
 	{
 		this.user = user;
 	}
-	
-	
 }

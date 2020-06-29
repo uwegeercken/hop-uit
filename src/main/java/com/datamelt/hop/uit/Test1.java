@@ -4,14 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
 //import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
+import com.datamelt.hop.utils.Constants;
 import com.datamelt.hop.utils.FileUtils;
-import com.datamelt.hop.utils.HopProjectCollection;
-import com.datamelt.hop.utils.TranslationFile;
+import com.datamelt.hop.utils.HopDatabaseConnection;
 
 public class Test1 
 {
@@ -25,32 +27,36 @@ public class Test1
 	    
 	    //VelocityContext context = new VelocityContext();
 	    
-		String inputFolder = "/run/media/uwe/5BDB-2357/temp_pdi-to-hop";
+		String inputFolder = "/run/media/uwe/5BDB-2357/temp_pdi-to-hop2";
 		String outputFolder = "/run/media/uwe/5BDB-2357/temp_pdi-to-hop-test-new-001";
+
+		String filename =  "/run/media/uwe/5BDB-2357/temp_pdi-to-hop2/pims/afis_cfdb_compare/pims_afis_compare_staging_cfdb.ktr";
 		
-		HopProjectCollection projects = new HopProjectCollection(inputFolder, outputFolder, true, true);
+		Converter converter = new Converter();
 		
-		ArrayList<TranslationFile> translationFiles = new ArrayList<>(); 
-		FileUtils.traverseFilesystem(inputFolder, new File(inputFolder), translationFiles);
+		PdiConverter pdiConverter = converter.convertPentahoPdiFile(inputFolder, outputFolder, filename);
+		pdiConverter.writeDocument();
 		
-		for(TranslationFile tFile: translationFiles)
+		VelocityContext context = new VelocityContext();
+		Template template = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
+		
+		File file = new File(filename);
+		String fileRelativOutputFolder = FileUtils.removeLeadingFileSeparator(FileUtils.getRelativeOutputFolder(inputFolder, file.getParent()));
+		String fileRelativRootFolder = FileUtils.getRootFolder(fileRelativOutputFolder);
+		
+		String connectionFileFolder = outputFolder + File.separator + fileRelativRootFolder + File.separator + Constants.PROJECT_METADATA_FOLDER_NAME;
+		
+		ArrayList<HopDatabaseConnection> connections = pdiConverter.getDatabaseConnections();
+		for(HopDatabaseConnection connection : connections)
 		{
-			//int test = converter.processFile(file);
-			
-			//HopDatabaseConnection> processConnectionNodes()
-			projects.addFileToProject(tFile);
+			converter.writeDatabaseMetadataFile(connectionFileFolder, connection, context, template);
 		}
 		
 		
+		//HopProjectCollection projects = new HopProjectCollection(inputFolder, outputFolder, true, true);
+		
+		
 		System.out.println();		
-		
-	//	TranslationFile file = new TranslationFile();
-		
-		
-		
-		//HopEnvironmentCollection environments = new HopEnvironmentCollection(inputfolder,outputfolder, true);
-		
-		//environments.writeEnvironments(outputfolder,context);
 		
 	}
 }
