@@ -1,6 +1,6 @@
 Hop Ultimate Import Tool
 
-Program to convert .kjb and .ktr files created by the Pentaho Data Integration tool (PDI) into the equivalent HOP formats .hpl and .hwf.
+Program to convert .kjb and .ktr files created by the Pentaho Data Integration tool (PDI) into the equivalent HOP formats .hpl and .hwf. See the project-hop website for details: https://www.project-hop.org
 
 Files are read from the input folder and recursively from subfolders, converted and output in the output folder. If additionally individual file names are specified, then only these files are processed from the input folder. The -f argument - to specify a filename - may be defined multiple times. If no file name is specified then all files in the input folder are processed. Only .ktr and .kjb files are processed. Files are not overwritten in case they already exist.
 
