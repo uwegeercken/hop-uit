@@ -25,6 +25,13 @@ public class Converter
 		return converter;
 	}
 	
+	public PdiConverter convertPentahoPdiFile(String inputFolder,String outputFolder, String filename, boolean projectPerSubfolder)
+	{
+		PdiConverter converter = new PdiConverter(inputFolder, outputFolder, filename, projectPerSubfolder);
+		converter.processFile();
+		return converter;
+	}
+	
 	/**
 	 * writes a database connection file to the filesystem
 	 * 

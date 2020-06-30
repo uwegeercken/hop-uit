@@ -84,12 +84,16 @@ public class PdiConverter
 		outputFilename = FileUtils.getOutputFilename(inputFolder, outputFolder, filename);
 	}
 	
-	public String getOutputFilename()
+	public PdiConverter(String inputfolder, String outputFolder, String filename, boolean projectPerSubfolder)
 	{
-		return FileUtils.translateFilename(outputFilename, fileType);
+		this.inputFolder = inputfolder;
+		this.outputFolder = outputFolder;
+		this.filename = filename;
+		
+		outputFilename = FileUtils.getOutputFilename(inputFolder, outputFolder, filename, projectPerSubfolder);
 	}
 	
-	public String getOutputFolder()
+	public String getOutputFilename()
 	{
 		return FileUtils.translateFilename(outputFilename, fileType);
 	}
@@ -453,6 +457,11 @@ public class PdiConverter
 	        	toBeRemoved.getParentNode().removeChild(toBeRemoved);
 	        }
         }
+	}
+
+	public String getOutputFolder() 
+	{
+		return outputFolder;
 	}
 
 	public int getFileType() 
