@@ -5,4 +5,6 @@
 #
 # uwe.geercken@web.de - last update: 2020-06-30
 
-java -cp .:lib/* com.datamelt.hop.uit.ImportTool "$@"
+script_dir="$(dirname "$(readlink -f "$0")")"
+
+java -cp ${script_dir}:${script_dir}/lib/* com.datamelt.hop.uit.ImportTool "$@"

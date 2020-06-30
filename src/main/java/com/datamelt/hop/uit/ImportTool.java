@@ -177,13 +177,13 @@ public class ImportTool
 							if(file!=null && file.exists() && file.canRead())
 							{
 								filecounter ++;
-								
-								PdiConverter pdiConverter = converter.convertPentahoPdiFile(inputfolder, outputfolder, translationFile.getPathAndFilename(),projectPerSubfolder);
-								logger.debug("writing file: " + translationFile.getPathAndFilename() + " to folder: " + outputfolder);
-								pdiConverter.writeDocument();
 
 								String fileRelativOutputFolder = FileUtils.getRelativeOutputFolder(inputfolder, file.getParent(),projectPerSubfolder);
 								String fileRelativRootFolder = FileUtils.getRootFolder(fileRelativOutputFolder);
+
+								PdiConverter pdiConverter = converter.convertPentahoPdiFile(inputfolder, outputfolder, translationFile.getPathAndFilename(),projectPerSubfolder);
+								logger.debug("writing file: " + outputfolder + File.separator + fileRelativOutputFolder + File.separator + file.getName());
+								pdiConverter.writeDocument();
 								
 								String connectionFileFolder = outputfolder + File.separator + fileRelativRootFolder + File.separator + Constants.PROJECT_METADATA_FOLDER_NAME + File.separator + Constants.PROJECT_DATABASE_FOLDER_NAME;
 
