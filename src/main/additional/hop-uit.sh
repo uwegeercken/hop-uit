@@ -3,8 +3,6 @@
 # Script to run the Hop Ultimate Import Tool (hop-uit)
 # The tool converts Pentaho PDI .ktr and .kjb files into .hpl and .hwf files for the project-hop platform.
 #
-# uwe.geercken@web.de - last update: 2020-06-11
+# uwe.geercken@web.de - last update: 2020-06-30
 
-lib_hop_uit=hop-uit-0.1.5-SNAPSHOT.jar
-
-java -cp .:lib/*:${lib_hop_uit} com.datamelt.hop.uit.ImportTool "$@"
+java -cp .:lib/* com.datamelt.hop.uit.ImportTool "$@"
