@@ -2,13 +2,11 @@ Hop Ultimate Import Tool
 
 Program to convert .kjb and .ktr files created by the Pentaho Data Integration tool (PDI) into the equivalent HOP formats .hpl and .hwf.
 
-Files are read from the input folder and recursively from subfolders, converted and output in the output folder. If additionally individual file names are specified, then only these files are processed from the input folder. The -f argument - to specify a filename - may be defined multiple times. If no file name is specified then all files in the input folder are processed. Only ktr and kjb files are processed. Files are not overwritten in case they already exist.
+Files are read from the input folder and recursively from subfolders, converted and output in the output folder. If additionally individual file names are specified, then only these files are processed from the input folder. The -f argument - to specify a filename - may be defined multiple times. If no file name is specified then all files in the input folder are processed. Only .ktr and .kjb files are processed. Files are not overwritten in case they already exist.
 
-A folder "hop-uit-environment" is created  in the output folder and represents a Hop environment base folder. Database metadata files from the conversion are created in a subfolder of this folder. If a Hop config directory is defined as the system variable HOP_CONFIG_DIRECTORY or it is specified using the -c flag, then an environment metadata file is created in this location. This metadata file points to the Hop environment base folder and will allow the user to switch to this environment from the Hop GUI and have all converted database metadata readily available. Note that some environment related features are not yet implemented.
+Per default the tool creates one project for each subfolder in the specified inputfolder. The project name corresponds to the name of the folder. Each of these project folders contains the converted files and a metadata folder with all database connections that are relevant to the converted files of the project. Files that are not located in any folder - in the inputfolder directly - are output to a default project folder. If the argument [project per subfolder] is set to false, then all converted files and database connections are output to a default project folder.
 
-You may optionally specify a name for the environment metadata file that will be created.
-
-NOTE: If no system variable HOP_CONFIG_DIRECTORY and no -c flag is specified, then the environment metadata file is created in the output folder specified. It can optionally be copied from this folder to the folder: /[Hop installation folder]/config/environments/metastore/Hop Environment, manually at a later point in time. Alternatively a new environment can be defined in the Hop GUI which points to the "hop-uit-environment" folder.
+If a HOP_CONFIG_DIRECTORY system variable is defined, it is used to create an environment metadata file in this location. Alternatively the -c flag can be used to specify the Hop config directory location. If both are not set, the the environment metadata file is copied to the output folder and may be copied to a Hop installation later.
 
 Adjust the log level in log4j2.properties file to DEBUG to receive more detailed output.
 
@@ -25,20 +23,20 @@ NOTE: You will need to change the file permissions on the hop-uit.sh script so t
 
 Usage:
 
-./hop-uit.sh -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name]
+./hop-uit.sh -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -s=[project per subfolder]
 
 * [inputfolder]           : required. path to the folder where the .ktr or .kjb files are located
 * [outputfolder]          : required. path to the folder where the converted ktr files (hpl files) are output to
 * [file name]             : optional. name of a ktr or kjb file to convert. argument may be specified multiple times
 * [config directory]      : optional. path to the Hop config directory
-* [environment file name] : optional. name of the environment file - with the xml extension
+* [project per subfolder] : optional. default=true. true or false, if a project per subfolder (located in the inputfolder) is created
 
 Examples:
 
 * ./hop-uit.sh -i=/home/me/input -o=/home/me/output
+* ./hop-uit.sh -i=/home/me/input -o=/home/me/output -s=false
 * ./hop-uit.sh -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config
 * ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile.ktr
-* ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile.ktr -e=myenv-001.xml
 * ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr
 
 Please send your feedback and help to enhance the tool.
@@ -65,4 +63,4 @@ under the License.
 uwe geercken
 uwe.geercken@web.de
 
-last update: 2020-06-03
+last update: 2020-06-30

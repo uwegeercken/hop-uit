@@ -31,18 +31,6 @@ import java.util.regex.Pattern;
 public class FileUtils 
 {
 	/**
-	 * construct the full name of a file by concatenating path and filename
-	 * 
-	 * @param path			the path to the file
-	 * @param filename		the name of the file
-	 * @return				the full path and name of the file
-	 */
-	public static String getFullName(String path, String filename)
-	{
-		return path + "/" + filename;
-	}
-	
-	/**
 	 * check if a given folder exists
 	 * 
 	 * @param path to the folder
@@ -124,25 +112,6 @@ public class FileUtils
 	}
 	
 	/**
-	 * remove the filename part from the path and then 
-	 * create the relevant folder
-	 * 
-	 * @param path			path to the folder
-	 * @param filename		name of the file
-	 * @throws Exception	exception if the folder can not be created
-	 */
-	public static void createFolder(String path, String filename) throws Exception
-	{
-		String fullPath = path.replaceAll("/" + filename, "");
-				
-		if(!existFolder(fullPath))
-		{
-			File folder = new File(fullPath);
-			folder.mkdirs();
-		}
-	}
-	
-	/**
 	 * textual information from the xml file is used to create metadata files. this information
 	 * might contain characters that are not suitable for a filename, so they need to be replaced
 	 * with valid ones
@@ -167,7 +136,7 @@ public class FileUtils
 	 * @param 	fileType indicating which type the file is
 	 * @return	the translated filename
 	 */
-	public static String migrateFilename(String filename, int fileType)
+	public static String translateFilename(String filename, int fileType)
 	{
 		if(fileType == Constants.FILE_TYPE_KJB)
 		{
@@ -190,30 +159,86 @@ public class FileUtils
 	 * @param translationFile	the relevant translation file
 	 * @return					name of the output folder
 	 */
-	public static String getFileOutputFolder(String outputFolder, HopProject project, TranslationFile translationFile)
+	public static String getFileOutputFolder(String inputFolder, String outputFolder, String filename)
 	{
-		String newFolder = outputFolder;
-		if(translationFile.getRelativeOutputFolder()!=null)
+		File file = new File(filename);
+		
+		String fileRelativOutputFolder = removeLeadingFileSeparator(getRelativeOutputFolder(inputFolder, file.getParent()));
+		
+		String newFolder;
+		
+		if(fileRelativOutputFolder!=null && !fileRelativOutputFolder.equals(""))
 		{
-			if(project.getName().equals(Constants.DEFAULT_PROJECT_NAME))
-			{
-				newFolder = newFolder + File.separator + Constants.DEFAULT_PROJECT_NAME + File.separator + translationFile.getRelativeOutputFolder();
-			}
-			else
-			{
-				newFolder = newFolder + File.separator + translationFile.getRelativeOutputFolder();
-			}
+			newFolder = outputFolder + File.separator + fileRelativOutputFolder;
 		}
 		else
 		{
-			newFolder = newFolder + File.separator + Constants.DEFAULT_PROJECT_NAME;
+			newFolder = outputFolder + File.separator + Constants.DEFAULT_PROJECT_NAME;
 		}
 		return newFolder;
 	}
 	
 	/**
+	 * for a given project and translationfile determine the correct output folder
+	 * 
+	 * @param project			the relevant project
+	 * @param translationFile	the relevant translation file
+	 * @return					name of the output folder
+	 */
+	public static String getFileOutputFolder(String inputFolder, String outputFolder, String filename, boolean projectPerSubfolder)
+	{
+		File file = new File(filename);
+		
+		String fileRelativOutputFolder = removeLeadingFileSeparator(getRelativeOutputFolder(inputFolder, file.getParent(),projectPerSubfolder));
+		
+		String newFolder;
+		
+		if(fileRelativOutputFolder!=null && !fileRelativOutputFolder.equals(""))
+		{
+			newFolder = outputFolder + File.separator + fileRelativOutputFolder;
+		}
+		else
+		{
+			newFolder = outputFolder + File.separator + Constants.DEFAULT_PROJECT_NAME;
+		}
+		return newFolder;
+	}
+	
+	/**
+	 * for a given project and translationfile determine the correct output folder
+	 * 
+	 * @param project			the relevant project
+	 * @param translationFile	the relevant translation file
+	 * @return					name of the output folder
+	 */
+	public static String getOutputFilename(String inputFolder, String outputFolder, String filename)
+	{
+		File file = new File(filename);
+		
+		String fileOutputFolder = getFileOutputFolder(inputFolder,outputFolder, filename);
+		
+		return fileOutputFolder + File.separator + file.getName();
+	}
+	
+	/**
+	 * for a given project and translationfile determine the correct output folder
+	 * 
+	 * @param project			the relevant project
+	 * @param translationFile	the relevant translation file
+	 * @return					name of the output folder
+	 */
+	public static String getOutputFilename(String inputFolder, String outputFolder, String filename, boolean projectPerSubfolder)
+	{
+		File file = new File(filename);
+		
+		String fileOutputFolder = getFileOutputFolder(inputFolder,outputFolder, filename, projectPerSubfolder);
+		
+		return fileOutputFolder + File.separator + file.getName();
+	}
+	
+	/**
 	 * determines the relative folder of the file compared to the input folder. it will be used
-	 * to write the ouput file to the same relativ folder compared to the output folder.
+	 * to write the ouput file to the same relative folder compared to the output folder.
 	 * 
 	 * @param inputFolder			the input folder of the files
 	 * @param fileParentFolder		the parent folder of the file
@@ -221,12 +246,30 @@ public class FileUtils
 	 */
 	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder)
 	{
-		return fileParentFolder.replaceFirst(inputFolder, "");
+		return removeLeadingFileSeparator(fileParentFolder.replaceFirst(inputFolder, ""));
+	}
+	
+	/**
+	 * determines the relative folder of the file compared to the input folder. it will be used
+	 * to write the ouput file to the same relative folder compared to the output folder.
+	 * 
+	 * @param inputFolder			the input folder of the files
+	 * @param fileParentFolder		the parent folder of the file
+	 * @return						the relativ folder compared to the input folder
+	 */
+	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder, boolean projectPerSubfolder)
+	{
+		String folder = fileParentFolder.replaceFirst(inputFolder, "");
+		if(projectPerSubfolder==false || folder.equals(""))
+		{
+			folder = Constants.DEFAULT_PROJECT_NAME + File.separator + removeLeadingFileSeparator(folder);
+		}
+		return folder;
 	}
 	
 	/**
 	 * get the root folder of a given folder. the root folder is the first folder in the files
-	 * relativ folder hierarchy. This folder corresponds to the name of the project the file
+	 * relative folder hierarchy. This folder corresponds to the name of the project the file
 	 * is located in
 	 * 
 	 * @param folder	the relative folder of a file

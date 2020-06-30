@@ -20,6 +20,7 @@ package com.datamelt.hop.uit;
 
 import com.datamelt.hop.utils.Constants;
 import com.datamelt.hop.utils.FileUtils;
+import com.datamelt.hop.utils.HopDatabaseConnection;
 import com.datamelt.hop.utils.HopProject;
 import com.datamelt.hop.utils.HopProjectCollection;
 import com.datamelt.hop.utils.SystemVariables;
@@ -73,9 +74,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  */
 public class ImportTool 
 {
-	
 	private static final String version 					= "0.1.5";
-	private static final String versionDate 				= "2020-06-28";
+	private static final String versionDate 				= "2020-06-29";
 	
 	private static String inputfolder;
 	private static String outputfolder;
@@ -121,17 +121,15 @@ public class ImportTool
 			
 			projectCollection.createProjectFolders();
 			
-			PdiImporter importer = new PdiImporter();
 
 			// we always need an inputfolder and an output folder
 			if(inputfolder != null && FileUtils.existFolder(inputfolder) && outputfolder!=null)
 			{
 				context = getVelocityContext();
-				importer.setVelocityContext(context);
-				
 				// template comes from the classpath
 				Template databaseTemplate = Velocity.getTemplate(Constants.DATABASE_METADATA_VELOCITY_TEMPLATE);
-				importer.setVelocityTemplate(databaseTemplate);
+				
+				Converter converter = new Converter();
 				
 				logger.info("processing files from: " + inputfolder);
 				logger.info("output files to: " + outputfolder);
@@ -179,12 +177,35 @@ public class ImportTool
 							if(file!=null && file.exists() && file.canRead())
 							{
 								filecounter ++;
-								int errors = importer.processFile(project, translationFile, outputfolder);
-								numberOfErrorsTotal = numberOfErrorsTotal + errors;
-								if(errors>0)
+								
+								PdiConverter pdiConverter = converter.convertPentahoPdiFile(inputfolder, outputfolder, translationFile.getPathAndFilename(),projectPerSubfolder);
+								logger.debug("writing file: " + translationFile.getPathAndFilename() + " to folder: " + outputfolder);
+								pdiConverter.writeDocument();
+
+								String fileRelativOutputFolder = FileUtils.getRelativeOutputFolder(inputfolder, file.getParent(),projectPerSubfolder);
+								String fileRelativRootFolder = FileUtils.getRootFolder(fileRelativOutputFolder);
+								
+								String connectionFileFolder = outputfolder + File.separator + fileRelativRootFolder + File.separator + Constants.PROJECT_METADATA_FOLDER_NAME + File.separator + Constants.PROJECT_DATABASE_FOLDER_NAME;
+
+								ArrayList<HopDatabaseConnection> connections = pdiConverter.getDatabaseConnections();
+								for(HopDatabaseConnection connection : connections)
+								{
+									try
+									{
+										logger.debug("writing database connection file: " + connection.getName() + " to folder: " + connectionFileFolder);
+										converter.writeDatabaseMetadataFile(connectionFileFolder, connection, context, databaseTemplate);
+									}
+									catch(Exception ex)
+									{
+										logger.error("error writing database connection file: " + connection.getName() + " to folder: " + connectionFileFolder);
+									}
+								}
+								
+								numberOfErrorsTotal = numberOfErrorsTotal + pdiConverter.getErrors();
+								if(pdiConverter.getErrors()>0)
 								{
 									numberOfFilesWithErrors ++;
-									logger.error("file not converted: " + file.getName() + ", errors in file: " + errors);
+									logger.error("file not converted: " + file.getName() + ", errors in file: " + pdiConverter.getErrors());
 								}
 								else
 								{
@@ -193,8 +214,6 @@ public class ImportTool
 							}
 						}
 					}
-					
-					
 				}
 				logger.info("number of files with errors: " + numberOfFilesWithErrors);
 				logger.info("number of total errors: " + numberOfErrorsTotal);
