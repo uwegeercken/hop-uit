@@ -75,7 +75,7 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 public class ImportTool 
 {
 	private static final String version 					= "0.1.5";
-	private static final String versionDate 				= "2020-06-29";
+	private static final String versionDate 				= "2020-06-30";
 	
 	private static String inputfolder;
 	private static String outputfolder;
@@ -405,27 +405,16 @@ public class ImportTool
     	System.out.println("If the argument [project per subfolder] is set to false, then all converted files and database connections");
     	System.out.println("are output to a default project folder.");
     	System.out.println();
-    	System.out.println("If a HOP_CONFIG_DIRECTORY system variable is defined, it is used to create an environment metadata file");
-    	System.out.println("in this location. Alternatively the -c flag can be used to specify the Hop config directory location.");
-    	System.out.println("If both are not set, the the environment metadata file is copied to the output folder and may be copied");
-    	System.out.println("to a Hop installation later.");
-    	System.out.println();
-    	System.out.println("You may optionally specify a name for the environment metadata file that will be created.");
-    	System.out.println();
-    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -c=[config directory] -e=[environment file name] -s=[project per subfolder]");
+    	System.out.println("ImportTool -i=[inputfolder] -o=[outputfolder] -f=[file name] -s=[project per subfolder]");
     	System.out.println("where [inputfolder]               : required. path to the folder where the ktr files are located");
     	System.out.println("      [outputfolder]              : required. path to the folder where the hpl files are output to.");
-    	System.out.println("      [file name]                 : optional. name of a .ktr file to convert. can be specified multiple times");
-    	System.out.println("      [config directory]          : optional. path to the Hop config directory");
-    	System.out.println("      [environment file name]     : optional. name of the environment file - with the xml extension");
+    	System.out.println("      [file name]                 : optional. name of a .ktr or .kjb file to convert. can be specified multiple times");
     	System.out.println("      [project per subfolder]     : optional. default=true. indicator - true or false - if a project shall be created for each subfolder");
     	System.out.println();
     	System.out.println("example: ImportTool -i=/home/me/input -o=/home/me/output");
-    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config");
-    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -c=/home/me/hop/config -e=myenv-001.xml");
-    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
-    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -s=false");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
+    	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr -f=myfile3.kjb");
     	System.out.println();
     	System.out.println("published as open source under the Apache License. read the licence notice.");
     	System.out.println("check https://github.com/uwegeercken for more");
