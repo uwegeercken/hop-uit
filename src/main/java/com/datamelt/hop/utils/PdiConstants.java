@@ -89,6 +89,7 @@ public class PdiConstants
 		HashMap<String, String> replacements = new HashMap<>();
 	    replacements.put("Internal.Job", "Internal.Workflow");
 	    replacements.put("Internal.Transformation", "Internal.Pipeline");
+	    replacements.put("Filename.Directory", "Filename.Folder");
 	    replacements.put(".ktr", ".hpl");
 	    replacements.put(".kbj", ".hwf");
 	    
