@@ -62,8 +62,8 @@ public class PdiConverter
 	// these all hold values that have to be replaced
 	private HashMap<String, String> replacementsKtrFile 				= PdiConstants.getXmlKtrReplacementMap();
 	private HashMap<String, String> replacementsKjbFile 				= PdiConstants.getXmlKjbReplacementMap();
-	private HashMap<String, String> replacementsKjbFileText 			= PdiConstants.getXmlKjbTextReplacementMap();
-	private HashMap<String, String> replacementsKjbFilePartialText 		= PdiConstants.getXmlKjbPartialTextReplacementMap();
+	private HashMap<String, String> replacementsText 					= PdiConstants.getXmlTextReplacementMap();
+	private HashMap<String, String> replacementsPartialText 			= PdiConstants.getXmlPartialTextReplacementMap();
 	
 	private String inputFolder;
 	private String outputFolder;
@@ -282,7 +282,7 @@ public class PdiConverter
 	        	if(typeNode.getLength()==1)
 	        	{
 	        		String currentValue = typeNode.item(0).getTextContent();
-	        		String replacement = replacementsKjbFileText.get(currentValue);
+	        		String replacement = replacementsText.get(currentValue);
         			if(replacement!=null)
         			{
         				typeNode.item(0).setTextContent(replacement);
@@ -308,11 +308,11 @@ public class PdiConverter
         	String nodeText = mainNode.getTextContent();
         	if(nodeText!=null)
         	{
-        		for(String pattern : replacementsKjbFilePartialText.keySet())
+        		for(String pattern : replacementsPartialText.keySet())
         		{
         			if(nodeText.matches(".*" + pattern + ".*"))
 	        		{
-	        			String replacementText = replacementsKjbFilePartialText.get(pattern);
+	        			String replacementText = replacementsPartialText.get(pattern);
 	        			String newText = nodeText.replaceAll(pattern, replacementText);
 	        			mainNode.setTextContent(newText);
 	        		}
@@ -327,11 +327,11 @@ public class PdiConverter
     			{
     				Node subNode = subNodeList.item(j);
     				String subNodeText = subNode.getTextContent();
-    				for(String pattern : replacementsKjbFilePartialText.keySet())
+    				for(String pattern : replacementsPartialText.keySet())
             		{
 	        			if(subNodeText.matches(".*" + pattern + ".*"))
 		        		{
-		        			String replacementText = replacementsKjbFilePartialText.get(pattern);
+		        			String replacementText = replacementsPartialText.get(pattern);
 		        			String newText = subNodeText.replaceAll(pattern, replacementText);
 		        			subNode.setTextContent(newText);
 		        		}
