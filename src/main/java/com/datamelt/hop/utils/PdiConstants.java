@@ -71,7 +71,7 @@ public class PdiConstants
 	 * 
 	 * @return map of xml texts and their replacements
 	 */
-	public static HashMap<String, String> getXmlKjbTextReplacementMap()
+	public static HashMap<String, String> getXmlTextReplacementMap()
 	{
 		HashMap<String, String> replacements = new HashMap<>();
 	    replacements.put("TRANS", "PIPELINE");
@@ -84,12 +84,14 @@ public class PdiConstants
 	 * 
 	 * @return map of partial xml texts and their replacements
 	 */
-	public static HashMap<String, String> getXmlKjbPartialTextReplacementMap()
+	public static HashMap<String, String> getXmlPartialTextReplacementMap()
 	{
 		HashMap<String, String> replacements = new HashMap<>();
 	    replacements.put("Internal.Job", "Internal.Workflow");
 	    replacements.put("Internal.Transformation", "Internal.Pipeline");
 	    replacements.put("Filename.Directory", "Filename.Folder");
+	    replacements.put("Repository.Directory", "Repository.Folder");
+	    replacements.put("Current.Directory", "Current.Folder");
 	    replacements.put(".ktr", ".hpl");
 	    replacements.put(".kbj", ".hwf");
 	    
