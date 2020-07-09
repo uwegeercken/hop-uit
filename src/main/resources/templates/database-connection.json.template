@@ -22,7 +22,7 @@
         "PREFERRED_SCHEMA_NAME": "$!{connection.attributes.preferredSchemaName}"
       },
       "manualUrl": "$!{connection.manualUrl}",
-      "username": "$!{connection.username}"
+      "username": "$!{connection.user}"
     }
   },
   "name": "$!{connection.name}"
