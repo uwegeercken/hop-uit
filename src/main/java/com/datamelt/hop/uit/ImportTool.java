@@ -74,8 +74,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  */
 public class ImportTool 
 {
-	private static final String version 					= "0.1.5";
-	private static final String versionDate 				= "2020-06-30";
+	private static final String version 					= "0.1.6";
+	private static final String versionDate 				= "2020-09-03";
 	
 	private static String inputfolder;
 	private static String outputfolder;
