@@ -241,6 +241,11 @@ public class ImportTool
 			if(args[i].startsWith("-i="))
 			{
 				inputfolder = args[i].substring(3);
+				// check that we don't have a trailing slash at the end
+				if(inputfolder!=null && !inputfolder.trim().equals("") && inputfolder.length()>1 && inputfolder.endsWith(File.separator) )
+				{
+					inputfolder = inputfolder.substring(0,inputfolder.length()-1);
+				}
 			}
 			else if(args[i].startsWith("-o="))
 			{
