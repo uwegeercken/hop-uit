@@ -4,7 +4,7 @@ Program to convert .kjb and .ktr files created by the Pentaho Data Integration t
 
 Files are read from the input folder and recursively from subfolders, converted and output in the output folder. If additionally individual file names are specified, then only these files are processed from the input folder. The -f argument - to specify a filename - may be defined multiple times. If no file name is specified then all files in the input folder are processed. Only .ktr and .kjb files are processed. Files are not overwritten in case they already exist.
 
-Per default the tool creates one project for each subfolder in the specified inputfolder. The project name corresponds to the name of the folder. Each of these project folders contains the converted files and a metadata folder with all database connections that are relevant to the converted files of the project. Files that are not located in any folder - in the inputfolder directly - are output to a default project folder. If the argument [project per subfolder] is set to false, then all converted files and database connections are output to a default project folder.
+Per default the tool creates one project for each subfolder in the specified inputfolder. The project name corresponds to the name of the folder. Each of these project folders contains the converted files and a metadata folder with all database connections that are relevant to the converted files of the project. Files that are not located in any folder - in the inputfolder directly - are output to a default project folder. If the argument [project per subfolder] is set to false, then all converted files and database connections are output to a default project folder. In this case, all converted files go to the same output folder so you need to take care that you do not have files with the same name.
 
 Adjust the log level in log4j2.properties file to DEBUG to receive more detailed output.
 
@@ -14,7 +14,8 @@ Run a "mvn clean install" to build the package. In the folder named "target" the
 
 * a folder "lib" with all dependent libraries , also the hop-uit library file: hop-uit-<version>.jar
 * a log4j2.properties file
-* a shell script to run the tool.
+* a shell script to run the tool on Linux.
+* a bat file to run the tool in Windows.
 
 Usage:
 
