@@ -33,7 +33,12 @@ public class PdiConstants
 	public static final String HOP_WORKFLOW_TAG_ACTION = "action";
 	
 	/**
-	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline 
+	 * returns a map of replacements between the Kettle/PDI format of a transformation and the Hop format of a pipeline
+	 * 
+	 *  some steps reference other steps. especially the multimerge join allows for any number of input steps. I have no
+	 *  way to do the node matching using a regular expression. so I hardcoded step0 to step5 here. If anybody tries to
+	 *  convert one with more input steps then it will break the step and one has to either extend the range here or
+	 *  remove the step from the canvas and re-create it.
 	 * 
 	 * @return	map of tag names and their replacements
 	 */
@@ -43,6 +48,12 @@ public class PdiConstants
 	    replacements.put("transformation", "pipeline");
 	    replacements.put("trans_type", "pipeline_type");
 	    replacements.put("trans_status", "pipeline_status");
+	    replacements.put("step0", "transform0");
+	    replacements.put("step1", "transform1");
+	    replacements.put("step2", "transform2");
+	    replacements.put("step3", "transform3");
+	    replacements.put("step4", "transform4");
+	    replacements.put("step5", "transform5");
 	    replacements.put("step", "transform");
 	    replacements.put("step_error_handling", "transform_error_handling");
 	    replacements.put("job", "workflow");

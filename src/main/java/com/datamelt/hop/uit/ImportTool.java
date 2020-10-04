@@ -75,7 +75,7 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  */
 public class ImportTool 
 {
-	private static final String version 					= "0.1.8";
+	private static final String version 					= "0.1.9";
 	private static final String versionDate 				= "2020-10-04";
 	
 	private static String inputfolder;
@@ -408,7 +408,8 @@ public class ImportTool
 	 */
 	private static void help()
 	{
-		System.out.println("ImportTool " + getVersionInfo()); 
+		System.out.println("ImportTool " + getVersionInfo());
+		System.out.println();
 		System.out.println("Program to convert files created by the Pentaho Data Integration tool (PDI) into the HOP format.");
 		System.out.println("Files are read from the input folder, converted and output to the output folder. If a file name is");
 		System.out.println("specified, this file is processed from the input folder. Multiple file names may be specified by");
@@ -433,9 +434,8 @@ public class ImportTool
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile.ktr");
     	System.out.println("       : ImportTool -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr -f=myfile3.kjb");
     	System.out.println();
-    	System.out.println("published as open source under the Apache License. read the licence notice.");
-    	System.out.println("check https://github.com/uwegeercken for more");
-    	System.out.println("all code by uwe geercken, 2020. uwe.geercken@web.de");
+    	System.out.println("published as open source under the Apache License. read the licence notice. check https://github.com/uwegeercken for more");
+    	System.out.println("created by uwe geercken, 2020. uwe.geercken@web.de");
     	System.out.println();
 	}
 	
