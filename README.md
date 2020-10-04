@@ -34,10 +34,10 @@ Examples:
 
 Issues:
 
-The multiway join step allows for any number of input steps - this tool only converts up to 6. If you have more then either the code has to be ammended or the step has to be removed
-from the Hop GUI canvas and re-added. Note that this step is introduced in Hop v0.40.
+The multiway join step allows for any number of input steps - this tool only converts up to 6. If you have more than that, then either the code here has to be ammended or the step has to be removed
+from the Hop GUI canvas and re-added. Note that the multiway join step is introduced in Hop v0.40.
 
-Please send your feedback and help to enhance the tool.
+Please send your feedback and help to enhance the tool. It is important to have your view of the world, your manpower and your expertise. 
 
 Copyright (C) 2020  Uwe Geercken
 
