@@ -32,6 +32,11 @@ Examples:
 * ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile.ktr
 * ./hop-uit.sh -i=/home/me/input -o=/home/me/output -f=myfile1.ktr -f=myfile2.ktr -f=myfile3.kjb
 
+Issues:
+
+The multiway join step allows for any number of input steps - this tool only converts up to 6. If you have more then either the code has to be ammended or the step has to be removed
+from the Hop GUI canvas and re-added. Note that this step is introduced in Hop v0.40.
+
 Please send your feedback and help to enhance the tool.
 
 Copyright (C) 2020  Uwe Geercken
@@ -56,4 +61,4 @@ under the License.
 uwe geercken
 uwe.geercken@web.de
 
-last update: 2020-06-30
+last update: 2020-10-04
