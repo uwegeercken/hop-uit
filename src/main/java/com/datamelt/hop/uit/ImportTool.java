@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
@@ -74,8 +75,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  */
 public class ImportTool 
 {
-	private static final String version 					= "0.1.6";
-	private static final String versionDate 				= "2020-09-03";
+	private static final String version 					= "0.1.7";
+	private static final String versionDate 				= "2020-10-01";
 	
 	private static String inputfolder;
 	private static String outputfolder;
@@ -238,45 +239,56 @@ public class ImportTool
 		logger.debug("process arguments from: " + Arrays.asList(args));
 		for(int i=0;i<args.length;i++)
 		{
-			if(args[i].startsWith("-i="))
-			{
-				inputfolder = args[i].substring(3);
-				// check that we don't have a trailing slash at the end
-				if(inputfolder!=null && !inputfolder.trim().equals("") && inputfolder.length()>1 && inputfolder.endsWith(File.separator) )
-				{
-					inputfolder = inputfolder.substring(0,inputfolder.length()-1);
+			// Linux includes the = sign in the first parameter, Windows will filter it out with a space.
+			if(SystemUtils.IS_OS_LINUX) {
+				if (args[i].startsWith("-i=")) {
+					inputfolder = args[i].substring(3);
+					// check that we don't have a trailing slash at the end
+					if (inputfolder != null && !inputfolder.trim().equals("") && inputfolder.length() > 1 && inputfolder.endsWith(File.separator)) {
+						inputfolder = inputfolder.substring(0, inputfolder.length() - 1);
+					}
+				} else if (args[i].startsWith("-o=")) {
+					outputfolder = args[i].substring(3);
+				} else if (args[i].startsWith("-f=")) {
+					File file = new File(args[i].substring(3));
+					if (file.exists() && file.canRead()) {
+						String relativeOutputFolder = FileUtils.getRelativeOutputFolder(inputfolder, file.getParent());
+						translationFiles.add(new TranslationFile(file, relativeOutputFolder));
+					} else {
+						logger.error("file not found: " + file.getPath());
+					}
+				} else if (args[i].startsWith("-c=")) {
+					configfolder = args[i].substring(3);
+				} else if (args[i].startsWith("-e=")) {
+					environmentfileName = args[i].substring(3);
+				} else if (args[i].startsWith("-s=")) {
+					projectPerSubfolder = Boolean.parseBoolean(args[i].substring(3));
+				}
+			} else {  // We are in MS Windows and have to look forward for the values of our parameters
+				if (args[i].startsWith("-i")) {
+					inputfolder = args[i+1];
+					// check that we don't have a trailing slash at the end
+					if (inputfolder != null && !inputfolder.trim().equals("") && inputfolder.length() > 1 && inputfolder.endsWith(File.separator)) {
+						inputfolder = inputfolder.substring(0, inputfolder.length() - 1);
+					}
+				} else if (args[i].startsWith("-o")) {
+					outputfolder = args[i+1];
+				} else if (args[i].startsWith("-f")) {
+					File file = new File(args[i+1]);
+					if (file.exists() && file.canRead()) {
+						String relativeOutputFolder = FileUtils.getRelativeOutputFolder(inputfolder, file.getParent());
+						translationFiles.add(new TranslationFile(file, relativeOutputFolder));
+					} else {
+						logger.error("file not found: " + file.getPath());
+					}
+				} else if (args[i].startsWith("-c")) {
+					configfolder = args[i+1];
+				} else if (args[i].startsWith("-e")) {
+					environmentfileName = args[i+1];
+				} else if (args[i].startsWith("-s")) {
+					projectPerSubfolder = Boolean.parseBoolean(args[i+1]);
 				}
 			}
-			else if(args[i].startsWith("-o="))
-			{
-				outputfolder = args[i].substring(3);
-			}
-			else if(args[i].startsWith("-f="))
-			{
-				File file = new File(args[i].substring(3));
-				if(file.exists() && file.canRead())
-				{
-					String relativeOutputFolder = FileUtils.getRelativeOutputFolder(inputfolder, file.getParent());
-					translationFiles.add(new TranslationFile(file, relativeOutputFolder));
-				}
-				else
-				{
-					logger.error("file not found: " + file.getPath());
-				}
-			}
-			else if(args[i].startsWith("-c="))
-			{
-				configfolder = args[i].substring(3);
-			}
-			else if(args[i].startsWith("-e="))
-			{
-				environmentfileName = args[i].substring(3);
-			}
-			else if(args[i].startsWith("-s="))
-			{
-				projectPerSubfolder = Boolean.parseBoolean(args[i].substring(3));
-			}
-
 		}
 	}
 	

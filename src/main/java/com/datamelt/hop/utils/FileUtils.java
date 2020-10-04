@@ -246,7 +246,11 @@ public class FileUtils
 	 */
 	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder)
 	{
-		return removeLeadingFileSeparator(fileParentFolder.replaceFirst(inputFolder, ""));
+		// In Windows there will be single backslashes in the path that must be escaped with double backslashes.
+		// That will make the inputFolderPath a valid regex search string for replacements in the fileParentFolder
+		// On linux, no replacement would be found, thus it has no effect.
+		String inputFolderPathRegex = inputFolder.replaceAll("\\\\", "\\\\\\\\");
+		return removeLeadingFileSeparator(fileParentFolder.replaceFirst(inputFolderPathRegex, ""));
 	}
 	
 	/**
@@ -259,7 +263,11 @@ public class FileUtils
 	 */
 	public static String getRelativeOutputFolder(String inputFolder, String fileParentFolder, boolean projectPerSubfolder)
 	{
-		String folder = fileParentFolder.replaceFirst(inputFolder, "");
+		// In Windows there will be single backslashes in the path that must be escaped with double backslashes.
+		// That will make the inputFolderPath a valid regex search string for replacements in the fileParentFolder
+		// On linux, no replacement would be found, thus it has no effect.
+		String inputFolderPathRegex = inputFolder.replaceAll("\\\\", "\\\\\\\\");
+		String folder = fileParentFolder.replaceFirst(inputFolderPathRegex, "");
 		if(projectPerSubfolder==false || folder.equals(""))
 		{
 			folder = Constants.DEFAULT_PROJECT_NAME + File.separator + removeLeadingFileSeparator(folder);
