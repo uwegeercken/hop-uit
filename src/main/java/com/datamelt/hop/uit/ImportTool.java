@@ -240,7 +240,7 @@ public class ImportTool
 		for(int i=0;i<args.length;i++)
 		{
 			// Linux includes the = sign in the first parameter, Windows will filter it out with a space.
-			if(SystemUtils.IS_OS_LINUX) {
+			if(SystemUtils.IS_OS_LINUX || SystemUtils.IS_OS_MAC) {
 				if (args[i].startsWith("-i=")) {
 					inputfolder = args[i].substring(3);
 					// check that we don't have a trailing slash at the end
@@ -264,7 +264,7 @@ public class ImportTool
 				} else if (args[i].startsWith("-s=")) {
 					projectPerSubfolder = Boolean.parseBoolean(args[i].substring(3));
 				}
-			} else {  // We are in MS Windows and have to look forward for the values of our parameters
+			} else if (SystemUtils.IS_OS_WINDOWS) {  // We are in MS Windows and have to look forward for the values of our parameters
 				if (args[i].startsWith("-i")) {
 					inputfolder = args[i+1];
 					// check that we don't have a trailing slash at the end
@@ -288,6 +288,8 @@ public class ImportTool
 				} else if (args[i].startsWith("-s")) {
 					projectPerSubfolder = Boolean.parseBoolean(args[i+1]);
 				}
+			} else {
+			  logger.error("Not Tested. Please help contributing");
 			}
 		}
 	}
