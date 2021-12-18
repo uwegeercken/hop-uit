@@ -11,7 +11,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <lib.velocity.version>2.2</lib.velocity.version>
-        <lib.log4j.version>2.13.3</lib.log4j.version>
+        <lib.log4j.version>2.17.0</lib.log4j.version>
         <lib.slf4j.version>1.7.21</lib.slf4j.version>
         <lib.json.version>20200518</lib.json.version>
   </properties>
